@@ -1,0 +1,2140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jan Shytyk</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            /* DARK THEME (DEFAULT) */
+            --bg: #050505; 
+            --accent: #4AF626;
+            --accent-glow: rgba(74, 246, 38, 0.6);
+            --text-main: #E0E0E0;
+            --text-dim: #666666;
+            --border: #1b1b1b;
+            --editor-bg: #0A0A0A;
+            --header-bg: rgba(0, 0, 0, 0.8);
+            --card-bg: rgba(5, 5, 5, 0.8);
+            --term-header: #111;
+            --highlight: #38bdf8; 
+            --danger: #ef4444;
+        }
+
+        [data-theme="light"] {
+            /* LIGHT THEME - DEEP NAVY ACCENT */
+            --bg: #f8fafc; 
+            --accent: #1e3a8a; 
+            --accent-glow: rgba(30, 58, 138, 0.6);
+            --text-main: #0f172a;
+            --text-dim: #64748b;
+            --border: #efefef;
+            --editor-bg: #ffffff;
+            --header-bg: rgba(248, 250, 252, 0.9);
+            --card-bg: rgba(255, 255, 255, 0.7);
+            --term-header: #f1f5f9;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: 'JetBrains Mono', monospace;
+            margin: 0;
+            overflow-x: hidden;
+            cursor: crosshair;
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+
+        @media (pointer: fine) { 
+            body { cursor: none; } 
+            a, button, input, .cursor-pointer, .editor-tab, .stack-item, .contact-card { cursor: none !important; } 
+        }
+        #cursor-dot { 
+            position: fixed; top: 0; left: 0; width: 4px; height: 4px; 
+            background-color: var(--accent); border-radius: 50%; 
+            pointer-events: none; z-index: 100000; transform: translate(-50%, -50%); 
+            box-shadow: 0 0 10px var(--accent); opacity: 0; transition: opacity 0.3s ease; 
+        }
+        #cursor-ring { 
+            position: fixed; top: 0; left: 0; width: 30px; height: 30px; 
+            border: 1px solid var(--accent-glow); border-radius: 50%; 
+            pointer-events: none; z-index: 99999; transform: translate(-50%, -50%); 
+            opacity: 0; transition: width 0.3s ease, height 0.3s ease, opacity 0.3s ease; 
+        }
+        .cursor-hover #cursor-ring { width: 50px; height: 50px; background-color: rgba(var(--accent), 0.05); border-color: var(--accent); }
+
+        #content-wrapper {
+            position: relative;
+            z-index: 10;
+        }
+
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0.08; 
+            transition: opacity 0.5s ease;
+        }
+
+        [data-theme="light"] #bg-canvas {
+            opacity: 0.05; 
+        }
+
+        .border-strict { border: 1px solid var(--border); transition: border-color 0.4s ease; }
+        .border-accent { border: 1px solid var(--accent); transition: border-color 0.4s ease; }
+        .sharp { border-radius: 0px !important; }
+        
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--border); }
+
+        .scanline {
+            width: 100%;
+            height: 100px;
+            z-index: 9999;
+            background: linear-gradient(0deg, rgba(0, 0, 0, 0) 0%, rgba(74, 246, 38, 0.02) 50%, rgba(0, 0, 0, 0) 100%);
+            opacity: 0.05;
+            position: fixed;
+            bottom: 100%;
+            animation: scanline 8s linear infinite;
+            pointer-events: none;
+        }
+
+        /* ПОЛНОЭКРАННАЯ СЕКЦИЯ REVEAL */
+        #reveal-section {
+            position: relative;
+            height: 160px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: transparent; 
+
+            width: 100%;
+            margin: 4rem 0;
+        }
+        @media (min-width: 768px) {
+            #reveal-section { margin: 6rem 0; }
+        }
+
+        .reveal-text {
+            font-size: clamp(1.5rem, 7vw, 6.5rem); 
+            font-weight: 900;
+            letter-spacing: -0.02em;
+            text-transform: uppercase;
+            color: transparent;
+            user-select: none;
+            position: relative;
+            text-align: center;
+            line-height: 1;
+            white-space: nowrap; 
+            max-width: 100%;
+            --x: -50%;
+            --y: 50%;
+        }
+
+        .reveal-text::after {
+            content: "BUILDING INVISIBLE";
+            position: absolute;
+            left: 0; top: 0; width: 100%; height: 100%;
+            color: var(--accent);
+            -webkit-text-stroke: 0px;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Мобильный вид: эффект фонарика по скроллу */
+        @media (max-width: 767px) {
+            .reveal-text::after {
+                opacity: 1;
+                /* Используем радиальный градиент-фонарик, координата X которого обновляется из JS */
+                -webkit-mask-image: radial-gradient(circle 65px at var(--x, -100%) var(--y, 50%), black 20%, transparent 100%);
+                mask-image: radial-gradient(circle 65px at var(--x, -100%) var(--y, 50%), black 20%, transparent 100%);
+            }
+        }
+
+        /* Десктопный вид: фонарик по наведению мыши */
+        @media (min-width: 768px) {
+            .reveal-text::after {
+                opacity: 0;
+                transition: opacity 0.3s ease;
+                -webkit-mask-image: radial-gradient(circle 90px at var(--x, 50%) var(--y, 50%), black 20%, transparent 100%);
+                mask-image: radial-gradient(circle 90px at var(--x, 50%) var(--y, 50%), black 20%, transparent 100%);
+            }
+            .reveal-text:hover::after {
+                opacity: 1;
+            }
+        }
+
+        .editor-window {
+            background: var(--editor-bg);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            transition: background-color 0.4s ease, border-color 0.4s ease;
+        }
+        .editor-header {
+            background: var(--bg);
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+        }
+        .editor-tabs {
+            display: flex;
+            background: var(--bg);
+            overflow-x: auto; /* Адаптив: горизонтальный скролл для вкладок */
+        }
+        .editor-tab {
+            padding: 8px 20px;
+            font-size: 11px;
+            color: var(--text-dim);
+            border-right: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.2s;
+            background: var(--editor-bg);
+            text-transform: lowercase;
+            white-space: nowrap; /* Запрет переноса на мобильных */
+            flex-shrink: 0;
+        }
+        .editor-tab.active {
+            background: var(--editor-bg);
+            color: var(--accent);
+            border-bottom: 1px solid var(--accent);
+        }
+        .editor-content {
+            padding: 24px;
+            font-size: 14px;
+            line-height: 1.6;
+            min-height: 350px;
+            overflow-x: auto;
+        }
+        .code-keyword { color: #C678DD; }
+        .code-string { color: #98C379; }
+        .code-key { color: #E06C75; }
+        .code-comment { color: #5C6370; font-style: italic; }
+
+        .stack-item {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: var(--card-bg);
+            backdrop-filter: blur(4px);
+        }
+        .stack-item:hover {
+            border-color: var(--accent);
+            background: rgba(var(--accent), 0.01);
+        }
+        .stack-item.active {
+            grid-column: span 2;
+            border-color: var(--accent);
+            background: var(--editor-bg);
+        }
+        @media (max-width: 768px) {
+            .stack-item.active { grid-column: span 1; }
+        }
+
+        .stack-details {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.4s ease;
+        }
+        .stack-item.active .stack-details {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .loading-sim {
+            display: inline-block;
+            overflow: hidden;
+            border-right: .15em solid var(--accent);
+            white-space: nowrap;
+            margin: 0 auto;
+            letter-spacing: .15em;
+            animation: typing 1s steps(20, end), blink-caret .75s step-end infinite;
+        }
+
+        @keyframes typing { from { width: 0 } to { width: 100% } }
+        @keyframes blink-caret { from, to { border-color: transparent } 50% { border-color: var(--accent); } }
+
+        .status-badge {
+            min-width: 100px;
+            text-align: center;
+            font-weight: 700;
+        }
+        @media (min-width: 768px) {
+            .status-badge { min-width: 120px; }
+        }
+
+        #side-drawer {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 100%; /* Адаптив: 100% на мобильных */
+            max-width: 450px; /* Ограничение для десктопа */
+            height: 100%;
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-left: 1px solid var(--border);
+            z-index: 1000;
+            transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 24px; /* Меньший паддинг для мобильных */
+            display: flex;
+            flex-direction: column;
+            color: var(--text-main);
+        }
+        @media (min-width: 768px) {
+            #side-drawer { padding: 40px; }
+        }
+        #side-drawer.open { right: 0; }
+
+        /* ТЕРМИНАЛ 3.0 */
+        #terminal-window {
+            position: fixed;
+            bottom: 40px;
+            left: 0;
+            width: 100%;
+            height: 0;
+            background: var(--bg); 
+            border-top: 1px solid var(--border);
+            z-index: 105;
+            display: flex;
+            flex-direction: column;
+            transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+        }
+
+        #terminal-window.expanded {
+            height: 280px;
+        }
+        @media (max-width: 768px) {
+            #terminal-window.expanded { height: 220px; } /* На мобильных терминал чуть ниже */
+        }
+
+        .terminal-window-header {
+            background: var(--term-header);
+            padding: 6px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+            color: var(--text-dim);
+        }
+
+        #terminal-body {
+            flex-grow: 1;
+            padding: 12px 16px;
+            font-size: 11px;
+            color: var(--accent);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            scroll-behavior: smooth;
+        }
+        @media (min-width: 768px) {
+            #terminal-body { padding: 12px 20px; }
+        }
+
+        .terminal-bar {
+            background: var(--bg); 
+            border-top: 1px solid var(--border);
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            z-index: 110;
+        }
+        @media (min-width: 768px) {
+            .terminal-bar { padding: 0 20px; }
+        }
+
+        .cli-btn {
+            background: var(--editor-bg);
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            padding: 4px 10px;
+            font-size: 9px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-left: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: bold;
+        }
+        @media (min-width: 768px) {
+            .cli-btn { padding: 4px 12px; margin-left: 10px; }
+        }
+        .cli-btn:hover {
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+        .cli-btn.active {
+            color: var(--accent);
+            animation: pulse-accent 1.5s infinite;
+            border-color: var(--accent);
+        }
+
+        @keyframes pulse-accent {
+            0% { box-shadow: 0 0 0 0 rgba(var(--accent), 0.4); }
+            70% { box-shadow: 0 0 0 4px rgba(var(--accent), 0); }
+            100% { box-shadow: 0 0 0 0 rgba(var(--accent), 0); }
+        }
+
+        .cli-container {
+            position: relative;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+        }
+
+        input#cli {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--accent);
+            width: 100%;
+            margin-left: 10px;
+            position: relative;
+            z-index: 2;
+        }
+
+        #cli-ghost {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-dim);
+            pointer-events: none;
+            z-index: 1;
+            white-space: pre;
+            opacity: 0.4;
+        }
+
+        #theme-toggle {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+            transition: color 0.3s ease;
+        }
+        #theme-toggle:hover {
+            color: var(--accent);
+        }
+
+        /* --- ЗАГРУЗОЧНЫЙ ТЕРМИНАЛ --- */
+        #boot-screen {
+            position: fixed; inset: 0; background: #000; z-index: 10000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 16px; transition: opacity 0.8s ease, visibility 0.8s;
+        }
+        #boot-terminal {
+            width: 100%; max-width: 760px;
+            height: auto; min-height: 300px; max-height: 90vh;
+            background: #050505; border: 1px solid #222;
+            display: flex; flex-direction: column; overflow: hidden;
+            box-shadow: 0 0 60px rgba(74,246,38,0.04), 0 0 0 1px #111;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+        @media (min-width: 640px) {
+            #boot-terminal { height: 480px; max-height: 80vh; }
+        }
+        #boot-terminal-header {
+            background: #0d0d0d; padding: 8px 14px; border-bottom: 1px solid #1a1a1a;
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 9px; color: #444; text-transform: uppercase; letter-spacing: 1.5px;
+            flex-shrink: 0;
+        }
+        #boot-terminal-body {
+            flex-grow: 1; padding: 16px 20px; font-size: 12px; color: #4AF626;
+            overflow-y: auto; display: flex; flex-direction: column; gap: 5px;
+            scrollbar-width: none; line-height: 1.6;
+        }
+        @media (min-width: 640px) {
+            #boot-terminal-body { padding: 20px 24px; font-size: 13px; }
+        }
+        #boot-terminal-body::-webkit-scrollbar { display: none; }
+        .boot-input-line { display: flex; align-items: center; gap: 10px; margin-top: 5px; }
+        #boot-cli-input {
+            background: transparent; border: none; outline: none; color: #fff;
+            flex-grow: 1; font-family: inherit; font-size: inherit; caret-color: #4AF626;
+        }
+        .highlight-cmd { color: var(--highlight); font-weight: bold; }
+        .text-error { color: var(--danger); font-weight: bold; }
+        /* Цветовая палитра для терминала */
+        .boot-dim   { color: #444; }
+        .boot-ok    { color: #4AF626; }
+        .boot-cmd   { color: #38bdf8; font-weight: bold; }
+        .boot-cmd-2   { color: #f83838; font-weight: bold; }
+        .boot-warn  { color: #f50b0b; font-weight: bold; }
+        .boot-white { color: #ccc; }
+        .boot-section {
+            border-top: 1px solid #1a1a1a; margin-top: 6px; padding-top: 8px;
+            color: #555; font-size: 10px; letter-spacing: 0.12em;
+        }
+
+        #boot-welcome-overlay {
+            position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+            background: #000; opacity: 0; pointer-events: none; transition: opacity 0.6s ease;
+            z-index: 10001;
+        }
+        #boot-welcome-overlay.show { opacity: 1; }
+        #boot-welcome-text {
+            font-size: clamp(2.5rem, 10vw, 5rem); font-weight: 900; letter-spacing: -0.05em; color: #4AF626;
+            text-transform: uppercase; transform: scale(0.95); transition: transform 1.5s ease;
+            text-align: center; padding: 0 16px;
+        }
+        #boot-welcome-overlay.show #boot-welcome-text { transform: scale(1); }
+
+        .boot-key-box {
+            border: 1px solid #2a2a2a; padding: 12px 16px; margin-top: 10px;
+            display: flex; flex-direction: column; gap: 10px;
+            background: rgba(74, 246, 38, 0.03);
+        }
+        @media (min-width: 480px) {
+            .boot-key-box { flex-direction: row; justify-content: space-between; align-items: center; }
+        }
+        .boot-key-value {
+            font-weight: bold; color: #fff; letter-spacing: 0.18em; font-size: 13px;
+            word-break: break-all;
+        }
+        #copy-boot-key {
+            color: #4AF626; border: 1px solid #2a4a20; padding: 6px 16px;
+            font-size: 10px; font-weight: bold; background: rgba(74,246,38,0.06);
+            font-family: inherit; cursor: pointer; letter-spacing: 0.1em;
+            transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+            white-space: nowrap; flex-shrink: 0;
+        }
+        #copy-boot-key:hover {
+            background: #4AF626; color: #000; border-color: #4AF626;
+            box-shadow: 0 0 16px rgba(74,246,38,0.25);
+        }
+        #copy-boot-key:active { transform: scale(0.97); }
+        .boot-key-hint {
+            font-size: 10px; color: #f59e0b; letter-spacing: 0.05em; margin-top: 4px;
+            display: flex; align-items: flex-start; gap: 6px;
+        }
+
+        .term-timestamp {
+            font-size: 9px;
+            opacity: 0.4;
+            margin-right: 8px;
+            user-select: none;
+        }
+
+        /* NOTIFICATION (TOAST) - FIXED VISIBILITY */
+        #toast-container {
+            position: fixed;
+            bottom: 40px; 
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            z-index: 100;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+            opacity: 0;
+            display: none; 
+        }
+        #toast-container.show {
+            display: flex;
+            transform: translateX(-50%) translateY(-10px);
+            opacity: 1;
+        }
+        #toast-msg {
+            background: var(--bg);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 6px 16px;
+            font-size: 10px;
+            text-transform: uppercase;
+            font-weight: bold;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* CONTACT CARD STYLES */
+        .contact-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .contact-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent);
+        }
+        .contact-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 2px;
+            background: var(--accent);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease;
+        }
+        .contact-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .brand-icon {
+            width: 1.25rem;
+            height: 1.25rem;
+            fill: currentColor;
+        }
+
+        /* SCROLL ANIMATIONS SYSTEM */
+        /* Базовые состояния для анимаций */
+        [data-scroll-animate] {
+            opacity: 0;
+        }
+
+        /* Раздел появляется снизу */
+        [data-scroll-animate="section"] {
+            transform: translateY(15px);
+            animation: none;
+        }
+        [data-scroll-animate="section"].visible {
+            animation: slideUpFade 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+
+        /* Элемент в списке (стейджеренный) */
+        [data-scroll-animate="item"] {
+            transform: translateY(12px);
+            animation: none;
+        }
+        [data-scroll-animate="item"].visible {
+            animation: slideUpFade 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+
+        /* Карточка (контакты, stack) */
+        [data-scroll-animate="card"] {
+            transform: translateY(12px) scale(0.98);
+            animation: none;
+        }
+        [data-scroll-animate="card"].visible {
+            animation: slideUpScale 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+
+        /* Текстовый контент */
+        [data-scroll-animate="text"] {
+            transform: translateY(10px);
+            animation: none;
+        }
+        [data-scroll-animate="text"].visible {
+            animation: slideUpFade 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+
+        /* Заголовок секции */
+        [data-scroll-animate="heading"] {
+            transform: translateX(-10px);
+            opacity: 0;
+            animation: none;
+        }
+        [data-scroll-animate="heading"].visible {
+            animation: slideInFromLeftFade 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+
+        /* Кнопки */
+        [data-scroll-animate="button"] {
+            transform: translateY(10px);
+            animation: none;
+        }
+        [data-scroll-animate="button"].visible {
+            animation: slideUpFade 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+
+        /* KEYFRAME ANIMATIONS */
+        @keyframes slideUpFade {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideUpScale {
+            from {
+                opacity: 0;
+                transform: translateY(12px) scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes slideInFromLeftFade {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Когда элемент уже виден, убираем дефолтный opacity */
+        [data-scroll-animate].visible {
+            opacity: 1;
+        }
+
+        /* Исключаем анимации для элементов, которые уже видны на загрузке */
+        [data-scroll-animate].initial-visible {
+            opacity: 1;
+            transform: none;
+            animation: none;
+        }
+
+        /* === PROJECTS LOCK OVERLAY === */
+        #projects-lock-wrapper {
+            position: relative;
+        }
+        #projects-list {
+            transition: filter 1s cubic-bezier(0.4,0,0.2,1), opacity 1s ease;
+            filter: blur(10px);
+            opacity: 0.3;
+            pointer-events: none;
+            user-select: none;
+        }
+        #projects-lock-wrapper.unlocked #projects-list {
+            filter: blur(0px);
+            opacity: 1;
+            pointer-events: auto;
+            user-select: auto;
+        }
+        #projects-gate {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            gap: 16px;
+            transition: opacity 0.8s ease;
+            padding: 16px;
+        }
+        #projects-lock-wrapper.unlocked #projects-gate {
+            opacity: 0;
+            pointer-events: none;
+        }
+        #projects-gate-inner {
+            border: 1px solid var(--border);
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 24px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            max-width: 380px;
+        }
+        @media (min-width: 480px) {
+            #projects-gate-inner { padding: 28px 32px; }
+        }
+        #gate-key-input {
+            background: transparent;
+            border: 1px solid var(--border);
+            outline: none;
+            color: var(--accent);
+            font-family: inherit;
+            font-size: 12px;
+            padding: 10px 12px;
+            width: 100%;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            text-align: center;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+        }
+        @media (min-width: 480px) {
+            #gate-key-input { font-size: 13px; padding: 10px 14px; }
+        }
+        #gate-key-input:focus { border-color: var(--accent); }
+        #gate-key-input.error {
+            border-color: var(--danger);
+            animation: gate-shake 0.35s ease;
+        }
+        @keyframes gate-shake {
+            0%,100% { transform: translateX(0); }
+            20% { transform: translateX(-5px); }
+            60% { transform: translateX(5px); }
+        }
+        #gate-submit {
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            font-family: inherit;
+            font-size: 10px;
+            font-weight: bold;
+            padding: 9px 24px;
+            cursor: pointer;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            transition: background 0.2s, color 0.2s;
+            width: 100%;
+        }
+        #gate-submit:hover { background: var(--accent); color: #000; }
+        #gate-error-msg {
+            color: var(--danger);
+            font-size: 10px;
+            font-weight: bold;
+            letter-spacing: 0.08em;
+            min-height: 14px;
+            text-align: center;
+        }
+        /* Тонкая анимация разблока — только граница секции */
+        @keyframes unlock-border {
+            0%   { outline: 1px solid transparent; }
+            30%  { outline: 1px solid var(--accent); }
+            100% { outline: 1px solid transparent; }
+        }
+        #projects-lock-wrapper.unlocked {
+            animation: unlock-border 1.2s ease forwards;
+        }
+    </style>
+</head>
+<body class="selection:bg-[var(--accent)] selection:text-white">
+
+    <div id="cursor-dot"></div>
+    <div id="cursor-ring"></div>
+
+    <canvas id="bg-canvas"></canvas>
+
+    <div id="content-wrapper">
+        <div class="scanline"></div>
+
+        <!-- ТЕРМИНАЛ ЗАГРУЗКИ -->
+        <div id="boot-screen">
+            <div id="boot-terminal">
+                <div id="boot-terminal-header">
+                    <div class="flex gap-2 items-center">
+                        <div class="w-2 h-2 rounded-full bg-red-500"></div>
+                        <div class="w-2 h-2 rounded-full bg-yellow-500"></div>
+                        <div class="w-2 h-2 rounded-full bg-green-500"></div>
+                        <span class="ml-2">SHYTYK_DEV // SESSION_INIT</span>
+                    </div>
+                    <span id="boot-session">Session: 0x8F2A</span>
+                </div>
+                <div id="boot-terminal-body">
+                    <!-- Контент добавляется динамически -->
+                </div>
+            </div>
+            <div id="boot-welcome-overlay">
+                <h2 id="boot-welcome-text">WELCOME IN</h2>
+            </div>
+        </div>
+
+        <!-- Сайд-бар -->
+        <div id="side-drawer" class="sharp">
+            <div class="flex-grow overflow-y-auto">
+                <div class="flex justify-between items-start mb-6 md:mb-8">
+                    <div class="text-[var(--accent)] text-[10px] md:text-xs font-bold uppercase" id="drawer-tag">PROJECT_DETAILS</div>
+                    <button onclick="closeDrawer()" class="text-[var(--text-dim)] hover:text-white uppercase text-xs md:text-sm">[ ESC ]</button>
+                </div>
+                
+                <h3 id="drawer-title" class="text-2xl md:text-3xl font-bold tracking-tighter mb-4 md:mb-6 uppercase">PROJECT_NAME</h3>
+                <div id="drawer-content" class="text-xs md:text-sm space-y-6 text-[var(--text-main)] leading-relaxed mb-8"></div>
+                
+                <div class="mt-8 md:mt-12 pt-4 pl-2 pr-2 pb-2 border-t border-strict">
+                    <div class="text-[var(--text-dim)] text-[9px] md:text-[10px] mb-4 uppercase">Технологический стек:</div>
+                    <div id="drawer-stack" class="flex flex-wrap gap-2"></div>
+                </div>
+            </div>
+
+            <div class="mt-6 md:mt-8 pt-6 border-t border-strict">
+                <a id="drawer-repo-link" href="#" target="_blank" class="flex items-center justify-center gap-2 md:gap-3 text-[var(--accent)] text-[10px] md:text-[11px] border border-accent w-full py-3 hover:bg-[var(--accent)] hover:text-black transition-all uppercase font-bold tracking-widest shadow-[4px_4px_0px_rgba(var(--accent),0.2)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]">
+                    <svg class="brand-icon" viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.43.372.823 1.102.823 2.222 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+                    View Source Repository
+                </a>
+            </div>
+        </div>
+
+        <!-- Уведомление -->
+        <div id="toast-container">
+            <div id="toast-msg" class="sharp">
+                <i data-lucide="check" class="w-3 h-3"></i>
+                <span id="toast-text">EMAIL_COPIED_TO_CLIPBOARD</span>
+            </div>
+        </div>
+
+        <!-- Хедер -->
+        <header class="flex justify-between items-center px-4 md:px-6 h-14 border-b border-strict fixed top-0 w-full bg-[var(--header-bg)] backdrop-blur-sm z-50 transition-colors duration-300">
+            <div class="flex items-center gap-2 md:gap-4">
+                <span class="font-bold tracking-tighter text-[var(--accent)] cursor-default text-sm md:text-base">SHYTYK_DEV</span>
+                <span class="text-[var(--text-dim)] text-[8px] md:text-[10px] border border-strict px-1 md:px-2 py-0.5 hidden sm:inline-block">V1.8.3_ADAPTIVE</span>
+            </div>   
+
+            <div class="flex items-center gap-4 md:gap-8 text-[10px] tracking-widest text-[var(--text-dim)]">
+                <!-- Theme Toggle Button -->
+                <button id="theme-toggle" onclick="toggleTheme()" title="Switch Theme">
+                    <i data-lucide="moon" id="theme-icon" class="w-4 h-4"></i>
+                </button>
+
+                <div class="hidden md:flex items-center gap-2">
+                    <span class="w-2 h-2 bg-[var(--accent)] animate-pulse"></span>
+                    <span id="uptime-display">UPTIME: 00:00:00</span>
+                </div>
+                <div id="clock" class="text-[9px] md:text-[10px]">00:00:00</div>
+            </div>
+        </header>
+
+        <main class="pt-24 md:pt-24 pb-12">
+            
+            <!-- Герой-секция -->
+            <section id="home" class="max-w-6xl mx-auto px-4 md:px-6 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 mb-16 md:mb-24 mt-4" data-scroll-animate="section">
+                <div data-scroll-animate="text">
+                    <div class="text-[var(--text-dim)] text-[9px] md:text-[10px] mb-3 md:mb-4 uppercase">Identity_Verified // ID: 0x7E3A</div>
+                    <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tighter mb-6 md:mb-8 leading-none uppercase">
+                        JAN SHYTYK<br/>
+                        <span class="text-[var(--accent)] text-4xl">Python Backend Developer</span>
+                    </h1>
+                    
+                    <div class="border-l-2 border-accent pt-4 pb-4 pl-4 md:pl-6 pr-4 md:pr-6 mb-6 md:mb-8">
+                        <div class="text-[var(--text-dim)] text-[9px] md:text-[10px] uppercase mb-2">System_Bio:</div>
+                        <p class="text-[var(--text-main)] leading-relaxed text-xs md:text-sm mb-4">
+                            Building clean, maintainable, and scalable server-side solutions. Focused on bridging the gap between complex business logic and efficient technical execution.
+                        </p>
+                        <p class="text-[var(--text-main)] text-[10px] md:text-xs italic">
+                            >_ Robust code for seamless experience
+                        </p>
+                    </div>
+
+                    <div class="flex gap-4">
+                        <button onclick="openTerminalWithWelcome()" class="text-[var(--accent)] text-[9px] md:text-[10px] border border-accent px-6 md:px-8 py-3 hover:bg-[var(--accent)] hover:text-black transition-all uppercase font-bold tracking-widest w-full sm:w-auto" data-scroll-animate="button">
+                            Execute
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="border border-strict bg-[var(--card-bg)] backdrop-blur-md p-4 md:p-6 font-mono text-[10px] md:text-xs tracking-wide relative overflow-hidden group transition-colors duration-300" data-scroll-animate="card">
+                    <div class="absolute inset-0 opacity-[0.03] pointer-events-none bg-[linear-gradient(transparent,rgba(255,255,255,0.05))]"></div>
+                    <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-500 bg-[radial-gradient(circle_at_50%_0%,rgba(30,58,138,0.1),transparent_60%)]"></div>
+                    <div class="relative z-10 space-y-4 md:space-y-5">
+                        <div class="flex justify-between text-[9px] md:text-[10px] uppercase text-[var(--text-dim)]">
+                            <span>My Profile</span>
+                            <span class="text-green-500">● ACTIVE</span>
+                        </div>
+                        <div class="space-y-2">
+                            <div class="flex justify-between border-b border-strict pb-1">
+                                <span class="text-[var(--text-dim)]">Role</span>
+                                <span class="text-[var(--accent)] font-bold">Python Backend Developer</span>
+                            </div>
+                            <div class="flex justify-between border-b border-strict pb-1">
+                                <span class="text-[var(--text-dim)]">Focus</span>
+                                <span>API / Services / Automation</span>
+                            </div>
+                            <div class="flex justify-between border-b border-strict pb-1">
+                                <span class="text-[var(--text-dim)]">Stack</span>
+                                <span>FastAPI · PostgreSQL · Redis · Git</span>
+                            </div>
+                            <div class="flex justify-between border-b border-strict pb-1">
+                                <span class="text-[var(--text-dim)]">Architecture</span>
+                                <span>Async · Scalable · Clean</span>
+                            </div>
+                            <div class="flex justify-between border-b border-strict pb-1">
+                                <span class="text-[var(--text-dim)]">Reliability</span>
+                                <span class="text-[var(--accent)] font-bold">Production-ready mindset</span>
+                            </div>
+                        </div>
+                        <div class="mt-4 text-[9px] md:text-[10px] text-[var(--text-dim)]">
+                            <span>$ whoami</span>
+                            <span class="ml-1 w-[5px] h-[10px] bg-[var(--text-main)] inline-block animate-blink"></span>
+                        </div>
+                        <div id="whoami" class="text-[9px] md:text-[10px] space-y-1"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ПОЛНОЭКРАННЫЙ РАЗДЕЛИТЕЛЬ -->
+            <section id="reveal-section">
+                <h2 class="reveal-text">BUILDING INVISIBLE</h2>
+            </section>
+
+            <!-- 01 TECH_INVENTORY -->
+            <section id="stack" class="max-w-6xl mx-auto px-4 md:px-6 mb-16 md:mb-24" data-scroll-animate="section">
+                <div class="flex items-center gap-4 mb-6 md:mb-8" data-scroll-animate="heading">
+                    <span class="text-[var(--accent)] font-bold text-sm md:text-base">01</span>
+                    <h2 class="text-lg md:text-xl tracking-tighter uppercase font-bold text-wrap">TECH INVENTORY // MY STACK</h2>
+                    <div class="h-px flex-grow bg-strict hidden sm:block"></div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 auto-rows-min">
+                    <div class="stack-item p-4 md:p-6 border-strict cursor-pointer" onclick="toggleStack(this)" data-scroll-animate="card">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <i data-lucide="code-2" class="w-4 h-4 md:w-5 md:h-5 text-[var(--accent)]"></i>
+                                <span class="font-bold uppercase text-xs md:text-sm">Languages</span>
+                            </div>
+                            <span class="text-[var(--text-dim)] text-[9px] md:text-[10px]">[ CLK_TO_EXPAND ]</span>
+                        </div>
+                        <div class="stack-details mt-4">
+                            <div class="loading-sim text-[var(--accent)] text-[9px] md:text-[10px] mb-4">LOADING_CORE_RESOURCES...</div>
+                            <ul class="text-[11px] md:text-xs space-y-2 text-[var(--text-dim)]">
+                                <li><span class="text-[var(--text-main)] font-bold">> Python 3.12:</span> AsyncIO, FastAPI, Django (DRF), Pytest</li>
+                                <li><span class="text-[var(--text-main)] font-bold">> SQL:</span> Query Optimization, CTE</li>
+                                <li><span class="text-[var(--text-main)] font-bold">> AI Integration:</span> OpenAI API, LangChain, Gemini API</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="stack-item p-4 md:p-6 border-strict cursor-pointer" onclick="toggleStack(this)" data-scroll-animate="card">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <i data-lucide="database" class="w-4 h-4 md:w-5 md:h-5 text-[var(--accent)]"></i>
+                                <span class="font-bold uppercase text-xs md:text-sm">Databases</span>
+                            </div>
+                            <span class="text-[var(--text-dim)] text-[9px] md:text-[10px]">[ CLK_TO_EXPAND ]</span>
+                        </div>
+                        <div class="stack-details mt-4">
+                            <div class="loading-sim text-[var(--accent)] text-[9px] md:text-[10px] mb-4">MOUNTING_PERSISTENT_STORAGE...</div>
+                            <ul class="text-[11px] md:text-xs space-y-2 text-[var(--text-dim)]">
+                                <li><span class="text-[var(--text-main)] font-bold">> PostgreSQL:</span> SQLAlchemy, Alembic, Indexing, JSON</li>
+                                <li><span class="text-[var(--text-main)] font-bold">> Redis:</span> Caching</li>
+                                <li><span class="text-[var(--text-main)] font-bold">> Architecture:</span> Database Design (Normalization/Denormalization)</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="stack-item p-4 md:p-6 border-strict cursor-pointer" onclick="toggleStack(this)" data-scroll-animate="card">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <i data-lucide="box" class="w-4 h-4 md:w-5 md:h-5 text-[var(--accent)]"></i>
+                                <span class="font-bold uppercase text-xs md:text-sm">Infrastructure</span>
+                            </div>
+                            <span class="text-[var(--text-dim)] text-[9px] md:text-[10px]">[ CLK_TO_EXPAND ]</span>
+                        </div>
+                        <div class="stack-details mt-4">
+                            <div class="loading-sim text-[var(--accent)] text-[9px] md:text-[10px] mb-4">MOUNTING_ENV...</div>
+                            <ul class="text-[11px] md:text-xs space-y-2 text-[var(--text-dim)]">
+                                <li><span class="text-[var(--text-main)] font-bold">> Docker:</span> Containerization, Multi-stage builds, Docker Compose</li>
+                                <li><span class="text-[var(--text-main)] font-bold">> AWS:</span> S3, Lambda (Serverless)</li>
+                                <li><span class="text-[var(--text-main)] font-bold">> CI/CD:</span> GitHub Actions, GitLab CI (Auto-deployment pipelines)</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="stack-item p-4 md:p-6 border-strict cursor-pointer" onclick="toggleStack(this)" data-scroll-animate="card">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <i data-lucide="blocks" class="w-4 h-4 md:w-5 md:h-5 text-[var(--accent)]"></i>
+                                <span class="font-bold uppercase text-xs md:text-sm">INTEGRATIONS</span>
+                            </div>
+                            <span class="text-[var(--text-dim)] text-[9px] md:text-[10px]">[ CLK_TO_EXPAND ]</span>
+                        </div>
+                        <div class="stack-details mt-4">
+                            <div class="loading-sim text-[var(--accent)] text-[9px] md:text-[10px] mb-4">INITIALIZING_SYSTEM_TOOLS...</div>
+                            <ul class="text-[11px] md:text-xs space-y-2 text-[var(--text-dim)]">
+                                <li><span class="text-[var(--text-main)] font-bold">> API Design:</span> RESTful API, WebSockets, CORS</li>
+                                <li><span class="text-[var(--text-main)] font-bold">> Version Control:</span> Git Flow, GitHub, Code Review patterns</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 02 JOB_QUEUE -->
+            <section id="projects" class="max-w-6xl mx-auto px-4 md:px-6 mb-16 md:mb-24" data-scroll-animate="section">
+                <div class="flex items-center gap-4 mb-6 md:mb-8" data-scroll-animate="heading">
+                    <span class="text-[var(--accent)] font-bold text-sm md:text-base">02</span>
+                    <h2 class="text-lg md:text-xl tracking-tighter uppercase font-bold text-wrap">JOB_QUEUE</h2>
+                    <div class="h-px flex-grow bg-strict hidden sm:block"></div>
+                </div>
+
+                <div id="projects-lock-wrapper">
+
+                    <!-- GATE OVERLAY -->
+                    <div id="projects-gate">
+                        <div id="projects-gate-inner">
+                            <div style="font-size:9px;color:var(--text-dim);letter-spacing:0.2em;text-transform:uppercase;text-align:center">// CLASSIFIED //</div>
+                            <div style="font-size:clamp(16px,4vw,22px);font-weight:900;letter-spacing:-0.02em;text-transform:uppercase;color:var(--text-main);text-align:center;line-height:1.1">ACCESS<br>RESTRICTED</div>
+                            <div style="font-size:10px;color:var(--text-dim);text-align:center;line-height:1.7;max-width:280px">
+                                Enter the <span style="color:var(--accent);font-weight:bold">SECURITY_KEY</span> generated during system initialization to unlock this section.
+                            </div>
+                            <input id="gate-key-input" type="text" maxlength="16" spellcheck="false" autocomplete="off" placeholder="XXXXXXXXXXXXXXXX">
+                            <div id="gate-error-msg"></div>
+                            <button id="gate-submit" onclick="verifyProjectsKey()">VERIFY KEY // ENTER</button>
+                            <div style="font-size:9px;color:var(--text-dim);opacity:0.45;text-align:center;line-height:1.5">Key was generated at boot.<br>Paste or type it above.</div>
+                        </div>
+                    </div>
+
+                    <!-- PROJECTS LIST (blurred until unlocked) -->
+                    <div id="projects-list" class="space-y-3">
+
+                    <div class="flex flex-col md:flex-row items-start md:items-center justify-between p-4 border-strict hover:border-accent group cursor-pointer bg-[var(--card-bg)] backdrop-blur-sm gap-4 md:gap-0" onclick="openDrawer('prj1')" data-scroll-animate="item">
+                        <div class="flex items-center gap-4 md:gap-6">
+                            <span class="text-[var(--text-dim)] text-[9px] md:text-[10px] mono">ID: 0x51A</span>
+                            <span class="group-hover:text-[var(--accent)] transition-colors font-bold uppercase tracking-tight text-xs md:text-sm"> finance-tracker-api</span>
+                        </div>
+                        <div class="flex items-center justify-between w-full md:w-auto md:gap-8">
+                            <div class="hidden lg:flex items-center gap-2">
+                                <span class="text-[8px] text-[var(--text-dim)]">CRC32:</span>
+                                <span class="text-[8px] text-[var(--text-dim)] mono">a7b2-f9e1</span>
+                            </div>
+                            <div class="flex items-center gap-4 md:gap-6 w-full md:w-auto justify-end">
+                                <div class="metric-bar w-16 hidden sm:block h-1 bg-strict"><div class="metric-fill h-1 bg-[var(--accent)] w-full"></div></div>
+                                <div class="status-badge text-[var(--accent)] text-[9px] md:text-[10px] border border-accent px-2 py-1 uppercase">DISCOVER</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col md:flex-row items-start md:items-center justify-between p-4 border-strict hover:border-accent group cursor-pointer bg-[var(--card-bg)] backdrop-blur-sm gap-4 md:gap-0" onclick="openDrawer('prj2')" data-scroll-animate="item">
+                        <div class="flex items-center gap-4 md:gap-6">
+                            <span class="text-[var(--text-dim)] text-[9px] md:text-[10px] mono">ID: 0x52B</span>
+                            <span class="group-hover:text-[var(--accent)] transition-colors font-bold uppercase tracking-tight text-xs md:text-sm"> python-auth-api</span>
+                        </div>
+                        <div class="flex items-center justify-between w-full md:w-auto md:gap-8">
+                            <div class="hidden lg:flex items-center gap-2">
+                                <span class="text-[8px] text-[var(--text-dim)]">CRC32:</span>
+                                <span class="text-[8px] text-[var(--text-dim)] mono">d4e5-c3b2</span>
+                            </div>
+                            <div class="flex items-center gap-4 md:gap-6 w-full md:w-auto justify-end">
+                                <div class="metric-bar w-16 hidden sm:block h-1 bg-strict"><div class="metric-fill h-1 bg-[var(--accent)] w-full"></div></div>
+                                <div class="status-badge text-[var(--accent)] text-[9px] md:text-[10px] border border-accent px-2 py-1 uppercase">DISCOVER</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-col md:flex-row items-start md:items-center justify-between p-4 border-strict hover:border-accent group cursor-pointer bg-[var(--card-bg)] backdrop-blur-sm gap-4 md:gap-0" onclick="openDrawer('prj3')" data-scroll-animate="item">
+                        <div class="flex items-center gap-4 md:gap-6">
+                            <span class="text-[var(--text-dim)] text-[9px] md:text-[10px] mono">ID: 0x53C</span>
+                            <span class="group-hover:text-[var(--accent)] transition-colors font-bold uppercase tracking-tight text-xs md:text-sm">  genstega-tg-bot</span>
+                        </div>
+                        <div class="flex items-center justify-between w-full md:w-auto md:gap-8">
+                            <div class="hidden lg:flex items-center gap-2">
+                                <span class="text-[8px] text-[var(--text-dim)]">CRC32:</span>
+                                <span class="text-[8px] text-[var(--text-dim)] mono">d4e5-c3b2</span>
+                            </div>
+                            <div class="flex items-center gap-4 md:gap-6 w-full md:w-auto justify-end">
+                                <div class="metric-bar w-16 hidden sm:block h-1 bg-strict"><div class="metric-fill h-1 bg-[var(--accent)] w-full"></div></div>
+                                <div class="status-badge text-[var(--accent)] text-[9px] md:text-[10px] border border-accent px-2 py-1 uppercase">DISCOVER</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col md:flex-row items-start md:items-center justify-between p-4 border-strict hover:border-accent group cursor-pointer bg-[var(--card-bg)] backdrop-blur-sm gap-4 md:gap-0" onclick="openDrawer('prj4')" data-scroll-animate="item">
+                        <div class="flex items-center gap-4 md:gap-6">
+                            <span class="text-[var(--text-dim)] text-[9px] md:text-[10px] mono">ID: 0x54D</span>
+                            <span class="group-hover:text-[var(--accent)] transition-colors font-bold uppercase tracking-tight text-xs md:text-sm">  src17-tg-bot</span>
+                        </div>
+                        <div class="flex items-center justify-between w-full md:w-auto md:gap-8">
+                            <div class="hidden lg:flex items-center gap-2">
+                                <span class="text-[8px] text-[var(--text-dim)]">CRC32:</span>
+                                <span class="text-[8px] text-[var(--text-dim)] mono">d4e5-c3b2</span>
+                            </div>
+                            <div class="flex items-center gap-4 md:gap-6 w-full md:w-auto justify-end">
+                                <div class="metric-bar w-16 hidden sm:block h-1 bg-strict"><div class="metric-fill h-1 bg-[var(--accent)] w-full"></div></div>
+                                <div class="status-badge text-[var(--accent)] text-[9px] md:text-[10px] border border-accent px-2 py-1 uppercase">DISCOVER</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-col md:flex-row items-start md:items-center justify-between p-4 border-strict hover:border-accent group cursor-pointer bg-[var(--card-bg)] backdrop-blur-sm gap-4 md:gap-0" onclick="openDrawer('prj5')" data-scroll-animate="item">
+                        <div class="flex items-center gap-4 md:gap-6">
+                            <span class="text-[var(--text-dim)] text-[9px] md:text-[10px] mono">ID: 0x55E</span>
+                            <span class="group-hover:text-[var(--accent)] transition-colors font-bold uppercase tracking-tight text-xs md:text-sm"> video-2-webm</span>
+                        </div>
+                        <div class="flex items-center justify-between w-full md:w-auto md:gap-8">
+                            <div class="hidden lg:flex items-center gap-2">
+                                <span class="text-[8px] text-[var(--text-dim)]">CRC32:</span>
+                                <span class="text-[8px] text-[var(--text-dim)] mono">d4e5-c3b2</span>
+                            </div>
+                            <div class="flex items-center gap-4 md:gap-6 w-full md:w-auto justify-end">
+                                <div class="metric-bar w-16 hidden sm:block h-1 bg-strict"><div class="metric-fill h-1 bg-[var(--accent)] w-full"></div></div>
+                                <div class="status-badge text-[var(--accent)] text-[9px] md:text-[10px] border border-accent px-2 py-1 uppercase">DISCOVER</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col md:flex-row items-start md:items-center justify-between p-4 border-strict hover:border-accent group cursor-pointer bg-[var(--card-bg)] backdrop-blur-sm gap-4 md:gap-0" onclick="openDrawer('prj6')" data-scroll-animate="item">
+                        <div class="flex items-center gap-4 md:gap-6">
+                            <span class="text-[var(--text-dim)] text-[9px] md:text-[10px] mono">ID: 0x56F</span>
+                            <span class="group-hover:text-[var(--accent)] transition-colors font-bold uppercase tracking-tight text-xs md:text-sm"> safely-chat</span>
+                        </div>
+                        <div class="flex items-center justify-between w-full md:w-auto md:gap-8">
+                            <div class="hidden lg:flex items-center gap-2">
+                                <span class="text-[8px] text-[var(--text-dim)]">CRC32:</span>
+                                <span class="text-[8px] text-[var(--text-dim)] mono">d4e5-c3b2</span>
+                            </div>
+                            <div class="flex items-center gap-4 md:gap-6 w-full md:w-auto justify-end">
+                                <div class="metric-bar w-16 hidden sm:block h-1 bg-strict"><div class="metric-fill h-1 bg-[var(--accent)] w-full"></div></div>
+                                <div class="status-badge text-[var(--accent)] text-[9px] md:text-[10px] border border-accent px-2 py-1 uppercase">DISCOVER</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    </div><!-- /projects-list -->
+                </div><!-- /projects-lock-wrapper -->
+            </section>
+
+            <!-- 03 ARCHITECT_BLUEPRINT -->
+            <section id="sec" class="max-w-6xl mx-auto px-4 md:px-6 mb-16 md:mb-24" data-scroll-animate="section">
+                <div class="flex items-center gap-4 mb-6 md:mb-8" data-scroll-animate="heading">
+                    <span class="text-[var(--accent)] font-bold text-sm md:text-base">03</span>
+                    <h2 class="text-lg md:text-xl tracking-tighter uppercase font-bold text-wrap">ARCHITECT_BLUEPRINT</h2>
+                    <div class="h-px flex-grow bg-strict hidden sm:block"></div>
+                </div>
+
+                <div class="editor-window sharp shadow-2xl" data-scroll-animate="card">
+                    <div class="editor-header">
+                        <div class="flex gap-1.5 hidden sm:flex">
+                            <div class="w-2 h-2 md:w-2.5 md:h-2.5 rounded-full bg-[#FF5F56]"></div>
+                            <div class="w-2 h-2 md:w-2.5 md:h-2.5 rounded-full bg-[#FFBD2E]"></div>
+                            <div class="w-2 h-2 md:w-2.5 md:h-2.5 rounded-full bg-[#27C93F]"></div>
+                        </div>
+                        <div class="text-[8px] md:text-[9px] text-[var(--text-dim)] uppercase trackingest font-bold ml-1 sm:ml-0 flex-grow sm:flex-grow-0">Architecture_Manifest // Jan Shytyk</div>
+                        <div class="flex gap-3 md:gap-4">
+                            <i data-lucide="search" class="w-3 h-3 text-[var(--text-dim)]"></i>
+                            <i data-lucide="settings" class="w-3 h-3 text-[var(--text-dim)]"></i>
+                        </div>
+                    </div>
+                    <div class="editor-tabs">
+                        <div class="editor-tab active cursor-pointer" data-file="design">system_design.yaml</div>
+                        <div class="editor-tab cursor-pointer" data-file="maintain">maintainability.txt</div>
+                        <div class="editor-tab cursor-pointer" data-file="growth">scalability.md</div>
+                    </div>
+                    <div class="editor-content p-4 md:p-6" id="editor-body">
+                        <pre class="font-mono text-[10px] md:text-xs whitespace-pre-wrap" id="code-content">
+<span class="code-comment"># System Architecture & Design Philosophy</span>
+<span class="code-key">architecture_style</span>: <span class="code-string">"Modular Monolith / Event-Driven Microservices"</span>
+<span class="code-key">communication</span>:
+  <span class="code-key">internal</span>: <span class="code-string">"gRPC / Internal Events"</span>
+  <span class="code-key">external</span>: <span class="code-string">"REST API / GraphQL (FastAPI)"</span>
+
+<span class="code-key">logic_layer</span>:
+  <span class="code-key">pattern</span>: <span class="code-string">"Domain Driven Design (DDD)"</span>
+  <span class="code-key">approach</span>: <span class="code-string">"Async-First (Non-blocking I/O)"</span>
+
+<span class="code-key">philosophy</span>: <span class="code-string">"Простота сложнее сложности. Избегаю оверинжиниринга, фокусируясь на надежности бизнес-процессов."</span></pre>
+                    </div>
+                </div>
+                <div class="mt-3 md:mt-4 flex justify-between items-center text-[8px] md:text-[9px] text-[var(--text-dim)] uppercase px-2">
+                    <span>UTF-8 // ARCHITECTURE_VIEWER</span>
+                    <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span> Blueprint: Validated</span>
+                </div>
+            </section>
+
+            <!-- 04 ESTABLISH_CONNECTION -->
+            <section id="contact" class="max-w-6xl mx-auto px-4 md:px-6 mb-12" data-scroll-animate="section">
+                <div class="flex items-center gap-4 mb-6 md:mb-8" data-scroll-animate="heading">
+                    <span class="text-[var(--accent)] font-bold text-sm md:text-base">04</span>
+                    <h2 class="text-lg md:text-xl tracking-tighter uppercase font-bold text-wrap">ESTABLISH_CONNECTION</h2>
+                    <div class="h-px flex-grow bg-strict hidden sm:block"></div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+                    <!-- Email Card -->
+                    <div class="contact-card border-strict p-4 md:p-6 bg-[var(--card-bg)] backdrop-blur-sm group flex flex-col justify-between" data-scroll-animate="card">
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <svg class="brand-icon text-[var(--accent)]" viewBox="0 0 24 24"><path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L12 9.573l8.073-6.08c1.618-1.214 3.927-.059 3.927 1.964z"/></svg>
+                                <span class="text-[7px] md:text-[8px] text-[var(--text-dim)] uppercase mono">Status: Privat</span>
+                            </div>
+                            <h3 class="text-xs md:text-sm font-bold uppercase mb-1">Direct_Mail</h3>
+                            <p class="text-[9px] md:text-[10px] text-[var(--text-dim)] mb-4">Direct Request</p>
+                        </div>
+                        <button onclick="copyEmail('shytyk.develop@architect.dev')" class="w-full py-2 border border-strict text-[9px] md:text-[10px] uppercase font-bold hover:bg-[var(--accent)] hover:text-black hover:border-accent transition-all flex items-center justify-center gap-2">
+                            <i data-lucide="copy" class="w-3 h-3 text-current"></i>
+                            Copy_Address
+                        </button>
+                    </div>
+
+                    <!-- Github Card -->
+                    <div class="contact-card border-strict p-4 md:p-6 bg-[var(--card-bg)] backdrop-blur-sm group flex flex-col justify-between" data-scroll-animate="card">
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <svg class="brand-icon text-[var(--accent)]" viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.43.372.823 1.102.823 2.222 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+                                <span class="text-[7px] md:text-[8px] text-[var(--text-dim)] uppercase mono">Status: Public</span>
+                            </div>
+                            <h3 class="text-xs md:text-sm font-bold uppercase mb-1">Source_Code</h3>
+                            <p class="text-[9px] md:text-[10px] text-[var(--text-dim)] mb-4">Explore Repositories</p>
+                        </div>
+                        <a href="https://github.com/shytyk-develop" target="_blank" class="w-full py-2 border border-strict text-[9px] md:text-[10px] uppercase font-bold hover:bg-[var(--accent)] hover:text-black hover:border-accent transition-all flex items-center justify-center gap-2">
+                            <svg class="w-3 h-3 fill-current" viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.43.372.823 1.102.823 2.222 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+                            Browse_Repo
+                        </a>
+                    </div>
+
+                    <!-- LinkedIn Card -->
+                    <div class="contact-card border-strict p-4 md:p-6 bg-[var(--card-bg)] backdrop-blur-sm group flex flex-col justify-between" data-scroll-animate="card">
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <svg class="brand-icon text-[var(--accent)]" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                                <span class="text-[7px] md:text-[8px] text-[var(--text-dim)] uppercase mono">Status: Public</span>
+                            </div>
+                            <h3 class="text-xs md:text-sm font-bold uppercase mb-1">Social_Profile</h3>
+                            <p class="text-[9px] md:text-[10px] text-[var(--text-dim)] mb-4">Professional Network</p>
+                        </div>
+                        <a href="https://linkedin.com/in/jan-shytyk" target="_blank" class="w-full py-2 border border-strict text-[9px] md:text-[10px] uppercase font-bold hover:bg-[var(--accent)] hover:text-black hover:border-accent transition-all flex items-center justify-center gap-2">
+                            <svg class="w-3 h-3 fill-current" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                            View_Profile
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- COPYRIGHT NOTICE - REPOSITIONED & REPROCESSED -->
+            <div class="flex justify-center opacity-30 pb-2">
+                <span class="text-[6px] md:text-[7px] uppercase tracking-[0.2em] md:tracking-[0.3em] text-[var(--text-dim)] font-bold text-center px-4">
+                    © 2026 JAN SHYTYK // ALL_RIGHTS_RESERVED
+                </span>
+            </div>
+
+        </main>
+
+        <!-- ОКНО ТЕРМИНАЛА -->
+        <div id="terminal-window" class="border-strict">
+            <div class="terminal-window-header">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="terminal" class="w-3 h-3"></i>
+                    <span>Terminal // SHYTYK_DEV</span>
+                </div>
+                <div class="flex items-center gap-3 ">
+                    <button onclick="clearTerminal()" title="Delete" class="hover:text-white transition-colors">
+                        <i data-lucide="trash-2" class="w-3 h-3"></i>
+                    </button>
+                    <button onclick="toggleTerminal()" title="Hide" class="hover:text-white transition-colors">
+                        <i data-lucide="minus" class="w-3 h-3"></i>
+                    </button>
+                    <button onclick="toggleTerminal()" title="Close" class="hover:text-white transition-colors">
+                        <i data-lucide="x" class="w-3 h-3 text-red-500"></i>
+                    </button>
+                </div>
+            </div>
+            <div id="terminal-body">
+                <div class="text-[var(--text-dim)] opacity-50 italic text-[10px] mb-2">-- ARCHITECT_OS Kernel initialized --</div>
+            </div>
+        </div>
+
+        <!-- ТЕРМИНАЛЬНАЯ ПАНЕЛЬ -->
+        <footer class="terminal-bar">
+            <span class="text-[var(--accent)] text-[10px] md:text-xs font-bold whitespace-nowrap" id="cli-prompt">root@architect:~$</span>
+            <div class="cli-container">
+                <input type="text" id="cli" placeholder="type 'help'..." spellcheck="false" autocomplete="off" class="text-[10px] md:text-xs">
+                <span id="cli-ghost" class="text-[10px] md:text-xs"></span>
+            </div>
+            <button id="term-toggle-btn" onclick="toggleTerminal()" class="cli-btn" title="Toggle Terminal Output">
+                <i data-lucide="chevron-up" class="w-3 h-3" id="term-arrow" style="transform: rotate(180deg);"></i>
+                <span class="ml-1 hidden sm:inline">OUTPUT</span>
+            </button>
+        </footer>
+    </div>
+
+    <script>
+        // Принудительная отрисовка иконок Lucide
+        function refreshIcons() {
+            if (window.lucide) {
+                window.lucide.createIcons();
+            }
+        }
+
+        // ТЕМА
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('portfolio-theme', newTheme);
+            updateThemeIcon(newTheme);
+            setTimeout(refreshIcons, 50);
+        }
+        function updateThemeIcon(theme) {
+            const icon = document.getElementById('theme-icon');
+            if (theme === 'light') {
+                icon.setAttribute('data-lucide', 'sun');
+            } else {
+                icon.setAttribute('data-lucide', 'moon');
+            }
+            refreshIcons();
+        }
+
+        // ЛОГИКА КУРСОРA
+        const dot = document.getElementById('cursor-dot');
+        const ring = document.getElementById('cursor-ring');
+        let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
+        let isCursorActive = false;
+
+        if (window.matchMedia("(pointer: fine)").matches) {
+            document.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+                
+                if (!isCursorActive) {
+                    isCursorActive = true;
+                    ringX = mouseX;
+                    ringY = mouseY;
+                    dot.style.opacity = '1';
+                    ring.style.opacity = '1';
+                }
+            });
+
+            document.addEventListener('mouseleave', () => {
+                isCursorActive = false;
+                dot.style.opacity = '0';
+                ring.style.opacity = '0';
+            });
+
+            document.addEventListener('mouseenter', (e) => {
+                isCursorActive = true;
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+                ringX = mouseX;
+                ringY = mouseY;
+                dot.style.opacity = '1';
+                ring.style.opacity = '1';
+            });
+
+            function animateCursor() {
+                if (isCursorActive) {
+                    const dx = mouseX - ringX;
+                    const dy = mouseY - ringY;
+                    const dist = Math.sqrt(dx*dx + dy*dy);
+                    
+                    const isHover = document.body.classList.contains('cursor-hover');
+                    const maxRadius = isHover ? 3 : 1.5; 
+
+                    if (dist > maxRadius) {
+                        const angle = Math.atan2(dy, dx);
+                        ringX = mouseX - Math.cos(angle) * maxRadius;
+                        ringY = mouseY - Math.sin(angle) * maxRadius;
+                    }
+
+                    dot.style.left = `${mouseX}px`;
+                    dot.style.top = `${mouseY}px`;
+                    ring.style.left = `${ringX}px`;
+                    ring.style.top = `${ringY}px`;
+                }
+                requestAnimationFrame(animateCursor);
+            }
+            animateCursor();
+
+            document.addEventListener('mouseover', (e) => {
+                if (e.target.closest('a, button, .cursor-pointer, .stack-item')) document.body.classList.add('cursor-hover');
+            });
+            document.addEventListener('mouseout', (e) => {
+                if (e.target.closest('a, button, .cursor-pointer, .stack-item')) document.body.classList.remove('cursor-hover');
+            });
+        }
+
+        const savedTheme = localStorage.getItem('portfolio-theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        updateThemeIcon(savedTheme);
+
+        // МАТРИЦА
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+        let columns = Math.floor(width / 20);
+        const characters = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        const charArray = characters.split("");
+        let drops = [];
+        for (let i = 0; i < columns; i++) drops[i] = Math.random() * -100;
+
+        function drawMatrix() {
+            const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+            ctx.fillStyle = isLight ? "rgba(248, 250, 252, 0.15)" : "rgba(5, 5, 5, 0.05)";
+            ctx.fillRect(0, 0, width, height);
+            ctx.fillStyle = isLight ? "#1e3a8a" : "#4AF626";
+            ctx.font = "14px monospace";
+            for (let i = 0; i < drops.length; i++) {
+                const text = charArray[Math.floor(Math.random() * charArray.length)];
+                ctx.fillText(text, i * 20, drops[i] * 20);
+                if (drops[i] * 20 > height && Math.random() > 0.975) drops[i] = 0;
+                drops[i]++;
+            }
+        }
+        setInterval(drawMatrix, 50);
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            columns = Math.floor(width / 20);
+            drops = [];
+            for (let i = 0; i < columns; i++) drops[i] = Math.random() * -100;
+        });
+
+        // ЗАГРУЗОЧНЫЙ ТЕРМИНАЛ
+        const bootScreen = document.getElementById('boot-screen');
+        const bootTerminalEl = document.getElementById('boot-terminal');
+        const bootBody = document.getElementById('boot-terminal-body');
+        const bootWelcome = document.getElementById('boot-welcome-overlay');
+
+        const bootSequence = [
+            { type: 'text', content: '<span class="boot-dim">──────────────────────────────────────────</span>' },
+            { type: 'text', content: '<span class="boot-ok">[ OK ]</span> <span class="boot-white">Booting ARCHITECT_OS kernel...</span>' },
+            { type: 'text', content: '<span class="boot-ok">[ OK ]</span> <span class="boot-white">Mounting encrypted filesystem...</span>' },
+            { type: 'text', content: '<span class="boot-ok">[ OK ]</span> <span class="boot-white">Loading environment modules...</span>' },
+            { type: 'text', content: '<span class="boot-ok">[ OK ]</span> <span class="boot-white">Establishing secure tunnel...</span>' },
+            { type: 'text', content: '<span class="boot-ok">[ OK ]</span> <span class="boot-white">Identity framework initialized.</span>' },
+            { type: 'text', content: '<span class="boot-dim">──────────────────────────────────────────</span>' },
+            { type: 'text', content: '' },
+            { type: 'text', content: '<span class="boot-warn">[ AUTH ]</span> <span class="boot-white">Authentication required to access this system.</span>' },
+            { type: 'text', content: '<span class="boot-white">  A one-time <span class="boot-cmd">SECURITY_KEY</span> will be generated for your session.</span>' },
+            { type: 'text', content: '<span class="boot-white">  This key will be required to access the projects section.</span>' },
+            { type: 'text', content: '' },
+            { type: 'text', content: '<span class="boot-white">Continue and generate your key?  [<span class="boot-cmd">y</span> / <span class="boot-cmd-2">n</span>]</span>' },
+            { type: 'input' }
+        ];
+
+        let bootSeqIdx = 0;
+
+        async function runBootSequence() {
+            if (bootSeqIdx >= bootSequence.length) return;
+            const item = bootSequence[bootSeqIdx];
+            if (item.type === 'text') {
+                const line = document.createElement('div');
+                line.className = 'opacity-0 translate-x-[-10px] transition-all duration-200';
+                line.innerHTML = item.content;
+                bootBody.appendChild(line);
+                setTimeout(() => line.classList.remove('opacity-0', 'translate-x-[-10px]'), 10);
+                bootBody.scrollTop = bootBody.scrollHeight;
+                bootSeqIdx++;
+                setTimeout(runBootSequence, 150 + Math.random() * 150);
+            } else if (item.type === 'input') {
+                createBootInput();
+            }
+        }
+
+        function createBootInput() {
+            const inputLine = document.createElement('div');
+            inputLine.className = 'boot-input-line';
+            inputLine.innerHTML = `<span class="boot-ok">❯</span><input type="text" id="boot-cli-input" maxlength="1" spellcheck="false" autocomplete="off">`;
+            bootBody.appendChild(inputLine);
+            const input = document.getElementById('boot-cli-input');
+            input.focus();
+            input.addEventListener('keydown', async (e) => {
+                if (e.key === 'Enter') {
+                    const val = input.value.trim().toLowerCase();
+                    input.disabled = true;
+                    if (val === 'y') {
+                        await startKeyGeneration();
+                    } else if (val === 'n') {
+                        blockBootAccess();
+                    } else {
+                        const err = document.createElement('div');
+                        err.className = 'boot-warn';
+                        err.textContent = '  Expected "y" or "n". Please try again.';
+                        bootBody.appendChild(err);
+                        input.disabled = false;
+                        input.value = '';
+                        input.focus();
+                    }
+                }
+            });
+        }
+
+        async function startKeyGeneration() {
+            const steps = [
+                'Collecting entropy from hardware pool...',
+                'Generating 128-bit session vector...',
+                'Computing key checksum...',
+                'Finalizing SECURITY_KEY...'
+            ];
+            for (let s of steps) {
+                const div = document.createElement('div');
+                div.innerHTML = `<span class="boot-cmd">[ GEN ]</span> <span class="boot-white">${s}</span>`;
+                bootBody.appendChild(div);
+                bootBody.scrollTop = bootBody.scrollHeight;
+                await new Promise(r => setTimeout(r, 380));
+            }
+
+            const key = Array.from({length: 16}, () => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'[Math.floor(Math.random() * 36)]).join('');
+
+            // Разделитель
+            const sep = document.createElement('div');
+            sep.innerHTML = '<span class="boot-dim">──────────────────────────────────────────</span>';
+            bootBody.appendChild(sep);
+
+            const keyBox = document.createElement('div');
+            keyBox.className = 'boot-key-box opacity-0 transition-opacity duration-700';
+            keyBox.innerHTML = `
+                <div class="boot-key-value">${key}</div>
+                <button id="copy-boot-key">COPY KEY</button>
+            `;
+            bootBody.appendChild(keyBox);
+            bootBody.scrollTop = bootBody.scrollHeight;
+            setTimeout(() => keyBox.classList.remove('opacity-0'), 10);
+
+            // Предупреждение — сохрани ключ
+            const hint = document.createElement('div');
+            hint.className = 'boot-key-hint';
+            hint.innerHTML = `<span class="boot-warn">⚠</span> <span>Save this key — you'll need it to unlock the projects section. It won't be shown again.</span>`;
+            bootBody.appendChild(hint);
+            bootBody.scrollTop = bootBody.scrollHeight;
+
+            document.getElementById('copy-boot-key').onclick = async () => {
+                const btn = document.getElementById('copy-boot-key');
+                const temp = document.createElement('textarea');
+                temp.value = key;
+                document.body.appendChild(temp);
+                temp.select();
+                document.execCommand('copy');
+                document.body.removeChild(temp);
+
+                sessionStorage.setItem('boot_security_key', key);
+
+                btn.textContent = 'COPIED ✓';
+                btn.style.background = '#4AF626';
+                btn.style.color = '#000';
+                btn.style.borderColor = '#4AF626';
+
+                const success = document.createElement('div');
+                success.style.marginTop = '8px';
+                success.innerHTML = `<span class="boot-ok">[ OK ]</span> <span class="boot-white">Key copied to clipboard. Initializing your session...</span>`;
+                bootBody.appendChild(success);
+                bootBody.scrollTop = bootBody.scrollHeight;
+                setTimeout(finalizeBoot, 1200);
+            };
+        }
+
+        function blockBootAccess() {
+            const div = document.createElement('div');
+            div.style.cssText = 'margin-top:12px;padding:14px 16px;border:1px solid #3a1010;background:rgba(239,68,68,0.06)';
+            div.innerHTML = `<div style="color:#ef4444;font-weight:bold;margin-bottom:6px;letter-spacing:0.1em">ACCESS_DECLINED</div>
+                <span style="color:#888;font-size:11px">Session terminated by user. Refresh the page to try again.</span>`;
+            bootBody.appendChild(div);
+            bootBody.scrollTop = bootBody.scrollHeight;
+        }
+
+        function finalizeBoot() {
+            bootTerminalEl.style.opacity = '0';
+            bootTerminalEl.style.transform = 'scale(0.97)';
+            setTimeout(() => {
+                bootWelcome.classList.add('show');
+                setTimeout(() => {
+                    bootScreen.style.opacity = '0';
+                    setTimeout(() => {
+                        bootScreen.style.display = 'none';
+                        refreshIcons();
+                    }, 800);
+                }, 1800);
+            }, 400);
+        }
+
+        window.onload = () => {
+            document.getElementById('boot-session').innerText = `Session: 0x${Math.floor(Math.random()*65535).toString(16).toUpperCase()}`;
+            runBootSequence();
+            refreshIcons();
+        };
+
+        // ЭФФЕКТ ФОНАРИКА (ДЕСКТОП И МОБИЛЬНЫЕ)
+        const revealText = document.querySelector('.reveal-text');
+        const revealSection = document.getElementById('reveal-section');
+
+        // Для десктопа: эффект фонарика по наведению
+        revealSection.addEventListener('mousemove', (e) => {
+            if (window.innerWidth >= 768) {
+                const rect = revealText.getBoundingClientRect();
+                revealText.style.setProperty('--x', `${e.clientX - rect.left}px`);
+                revealText.style.setProperty('--y', `${e.clientY - rect.top}px`);
+            }
+        });
+
+        // Для мобилок: проявление радиальным фонариком слева направо по скроллу
+        window.addEventListener('scroll', () => {
+            if (window.innerWidth < 768) {
+                const rect = revealSection.getBoundingClientRect();
+                const windowHeight = window.innerHeight;
+                
+                // Берем за основу центр секции, чтобы эффект начинался когда она уже показалась
+                const sectionCenterY = rect.top + rect.height / 2;
+                
+                // Начинаем: когда центр секции прошел 80% экрана снизу
+                const start = windowHeight * 0.8;
+                // Заканчиваем: когда центр секции дошел до 20% высоты экрана сверху
+                const end = windowHeight * 0.2;
+                
+                // Считаем прогресс по координате X от -30% (полностью за левым краем) 
+                // до 130% (полностью за правым краем)
+                let progress = ((start - sectionCenterY) / (start - end)) * 100;
+                progress = Math.max(-30, Math.min(130, progress));
+                
+                revealText.style.setProperty('--x', `${progress}%`);
+                revealText.style.setProperty('--y', `50%`);
+            }
+        });
+        
+        window.dispatchEvent(new Event('scroll'));
+
+        // КОНТЕНТ BLUEPRINT
+        const bluePrintContent = {
+            design: `<span class="code-comment"># System Architecture & Design Philosophy</span>
+<span class="code-key">architecture_patterns</span>:
+  <span class="code-key">core</span>: <span class="code-string">"Async-First RESTful APIs (FastAPI / Starlette)"</span>
+  <span class="code-key">methodology</span>: <span class="code-string">"Domain-Driven Design (DDD) & Clean Architecture"</span>
+  <span class="code-key">security</span>: <span class="code-string">"Security-by-Design (JWT, AES, Argon2, OWASP standards)"</span>
+
+<span class="code-key">data_strategy</span>:
+  <span class="code-key">relational</span>: <span class="code-string">"PostgreSQL with Async SQLAlchemy & Alembic"</span>
+  <span class="code-key">caching</span>: <span class="code-string">"Redis for high-speed data retrieval and session management"</span>
+
+<span class="code-key">philosophy</span>: <span class="code-string">"I focus on KISS and YAGNI principles. My goal is to build robust systems that are human-readable and machine-scalable."</span>`,
+    
+            maintain: `<span class="code-comment"># Code Reliability & Maintainability Standards</span>
+<span class="code-key">code_quality</span>:
+  <span class="code-key">static_analysis</span>: <span class="code-string">"Strict Mypy type-checking, Ruff & Flake8 linting"</span>
+  <span class="code-key">data_integrity</span>: <span class="code-string">"Strict Schema Validation with Pydantic V2"</span>
+  <span class="code-key">documentation</span>: <span class="code-string">"Self-documenting OpenAPI (Swagger) & technical specifications"</span>
+
+<span class="code-key">stability</span>:
+  <span class="code-key">testing</span>: <span class="code-string">"Pytest (Unit & Integration), Test-Driven approach (TDD)"</span>
+  <span class="code-key">observability</span>: <span class="code-string">"Structured JSON Logging & Automated Health Monitoring"</span>
+
+<span class="code-key">quality_gate</span>: <span class="code-string">"Applying SOLID and DRY principles to ensure long-term code support."</span>`,
+    
+            growth: `<span class="code-comment"># Scalability & Infrastructure Management</span>
+<span class="code-key">performance</span>:
+  <span class="code-key">scaling</span>: <span class="code-string">"Stateless Service Architecture (Horizontal Scaling ready)"</span>
+  <span class="code-key">concurrency</span>: <span class="code-string">"Asynchronous Background Task Processing"</span>
+
+<span class="code-key">infrastructure_as_code</span>:
+  <span class="code-key">containerization</span>: <span class="code-string">"Docker & Docker Compose for environment parity"</span>
+  <span class="code-key">ci_cd</span>: <span class="code-string">"GitHub Actions for automated testing and deployment"</span>
+
+<span class="code-key">future_proofing</span>: <span class="code-string">"Designing DB schemas with indexing and partitioning in mind for High-Load potential."</span>`
+        };
+
+        // ТЕРМИНАЛ LOGIC
+        const terminalWindow = document.getElementById('terminal-window');
+        const terminalBody = document.getElementById('terminal-body');
+        const termToggleBtn = document.getElementById('term-toggle-btn');
+        const termArrow = document.getElementById('term-arrow');
+        const cliInput = document.getElementById('cli');
+        const cliGhost = document.getElementById('cli-ghost');
+        const cliPrompt = document.getElementById('cli-prompt');
+
+        let cmdHistory = [];
+        let historyIdx = -1;
+
+        function toggleTerminal() {
+            terminalWindow.classList.toggle('expanded');
+            termToggleBtn.classList.remove('active');
+            const isExpanded = terminalWindow.classList.contains('expanded');
+            termArrow.style.transform = isExpanded ? 'rotate(0deg)' : 'rotate(180deg)';
+        }
+
+        function clearTerminal() {
+            terminalBody.innerHTML = '<div class="text-[var(--text-dim)] opacity-50 italic text-[10px] mb-2">-- Session cleared --</div>';
+        }
+
+        async function printToTerminal(lines, isError = false) {
+            if (!terminalWindow.classList.contains('expanded')) {
+                terminalWindow.classList.add('expanded');
+                termArrow.style.transform = 'rotate(0deg)';
+                termToggleBtn.classList.remove('active');
+            }
+
+            const timestamp = new Date().toLocaleTimeString([], { hour12: false });
+            const group = document.createElement('div');
+            group.className = "mb-4 last:mb-0"; 
+            terminalBody.appendChild(group);
+
+            for (const line of lines) {
+                const p = document.createElement('div');
+                const textColorClass = isError ? 'text-red-500' : '';
+                p.className = `flex gap-1 items-start opacity-0 translate-x-[-5px] transition-all duration-300 ${textColorClass}`;
+                p.innerHTML = `<span class="term-timestamp">[${timestamp}]</span> <span class="opacity-30">>></span> <span class="flex-grow">${line}</span>`;
+                group.appendChild(p);
+                
+                setTimeout(() => p.classList.remove('opacity-0', 'translate-x-[-5px]'), 10);
+                terminalBody.scrollTop = terminalBody.scrollHeight;
+                await new Promise(r => setTimeout(r, 60));
+            }
+        }
+
+        const availableSections = ['home', 'stack', 'projects', 'spec', 'contact'];
+
+        const commands = {
+            'help': () => printToTerminal([
+                "COMMANDS_MANUAL:",
+                "  cd [dir]  - Перейти в раздел (home, stack, projects, spec, contact)",
+                "  ls        - Показать доступные разделы",
+                "  whoami    - Информация об архитекторе",
+                "  theme     - Сменить цветовую схему (light/dark)",
+                "  date      - Текущее время системы",
+                "  clear     - Очистить консоль",
+                "  help      - Показать эту справку"
+            ]),
+            'ls': () => printToTerminal(["Разделы системы:", ...availableSections.map(s => `  /bin/${s}`)]),
+            'whoami': () => printToTerminal([
+                "IDENT_VERIFIED: Jan Shytyk",
+                "CLASS: Backend_Architect",
+                "CORE: Python / FastAPI / PostgreSQL",
+                "STATUS: ONLINE"
+            ]),
+            'date': () => printToTerminal([new Date().toString()]),
+            'theme': () => toggleTheme(),
+            'clear': () => clearTerminal(),
+            'cd': (args) => {
+                const target = args[0]?.toLowerCase();
+                if (target === 'home') {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    cliPrompt.innerHTML = `root@architect:~$`;
+                    printToTerminal([`PATH_UPDATE: ~/${target}... OK`]);
+                } else if (availableSections.includes(target)) {
+                    document.getElementById(target).scrollIntoView({ behavior: 'smooth' });
+                    cliPrompt.innerHTML = `root@architect:~/${target}$`;
+                    printToTerminal([`PATH_UPDATE: ~/${target}... OK`]);
+                } else {
+                    printToTerminal([`ERROR: Раздел '${target || ''}' не существует. Используйте 'ls'.`], true);
+                }
+            }
+        };
+
+        cliInput.addEventListener('input', (e) => {
+            const val = e.target.value.toLowerCase();
+            cliGhost.textContent = "";
+            if (val.startsWith('cd ')) {
+                const query = val.slice(3);
+                const match = availableSections.find(s => s.startsWith(query));
+                if (match) cliGhost.textContent = val + match.slice(query.length);
+            } else {
+                const match = Object.keys(commands).find(c => c.startsWith(val));
+                if (match && val) cliGhost.textContent = match;
+            }
+        });
+
+        cliInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Tab' || (e.key === 'ArrowRight' && cliGhost.textContent)) {
+                e.preventDefault();
+                if (cliGhost.textContent) {
+                    cliInput.value = cliGhost.textContent;
+                    cliGhost.textContent = "";
+                }
+            }
+            if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (historyIdx < cmdHistory.length - 1) {
+                    historyIdx++;
+                    cliInput.value = cmdHistory[cmdHistory.length - 1 - historyIdx];
+                }
+            }
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (historyIdx > 0) {
+                    historyIdx--;
+                    cliInput.value = cmdHistory[cmdHistory.length - 1 - historyIdx];
+                } else {
+                    historyIdx = -1;
+                    cliInput.value = "";
+                }
+            }
+            if (e.key === 'Enter') {
+                const raw = cliInput.value.trim();
+                cliInput.value = "";
+                cliGhost.textContent = "";
+                if (!raw) return;
+                cmdHistory.push(raw);
+                historyIdx = -1;
+                const [cmd, ...args] = raw.split(" ");
+                if (commands[cmd.toLowerCase()]) {
+                    commands[cmd.toLowerCase()](args);
+                } else {
+                    printToTerminal([`ERROR: Команда '${cmd}' не распознана.`], true);
+                }
+            }
+        });
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const drawer = document.getElementById('side-drawer');
+                const term = document.getElementById('terminal-window');
+                if (drawer.classList.contains('open')) closeDrawer();
+                else if (term.classList.contains('expanded')) toggleTerminal();
+            }
+        });
+
+        document.querySelectorAll('.editor-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.editor-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                const file = tab.getAttribute('data-file');
+                document.getElementById('code-content').innerHTML = bluePrintContent[file];
+            });
+        });
+
+        function toggleStack(element) {
+            const isActive = element.classList.contains('active');
+            document.querySelectorAll('.stack-item').forEach(item => item.classList.remove('active'));
+            if (!isActive) element.classList.add('active');
+        }
+
+        const projects = {
+            prj1: { 
+                title: "finance-tracker-api", 
+                content: "A secure FastAPI backend for personal finance tracking. Features JWT auth, PostgreSQL integration, real-time balances, and advanced transaction filtering.", 
+                stack: ["Python 3.9+", "PostgreSQL", "FastAPI", "SQLAlchemy", "Pydantic", "Vercel", "JWT (jose & argon2)", "SlowAPI", "Uvicorn"],
+                repoUrl: "https://github.com/shytyk-develop/finance-tracker-api"
+            },
+
+            prj2: { 
+                title: "python-auth-api", 
+                content: "A robust FastAPI Auth system: JWT, role-based admin features, rate limiting, and async migrations. Secure, scalable, and easy to setup. ", 
+                stack: ["Python 3.9+", "PostgreSQL", "FastAPI", "Vercel", "SQLAlchemy", "Alembic", "JWT (jose & argon2)", "SlowAPI", "Bcrypt", "aiosmtplib"],
+                repoUrl: "https://github.com/shytyk-develop/python-auth-api"
+            },
+
+            prj3: { 
+                title: "genstega-tg-bot", 
+                content: " GenStega hides secret text inside images without altering their look. Securely encrypt data in one click to bypass filters and keep your communication invisible to everyone but the recipient. ", 
+                stack: ["Python 3.9+", "Aiogram", "Cryptography", "SHA256", "Pillow (PIL)", "Vercel", "FastAPI"],
+                repoUrl: "https://github.com/shytyk-develop/genstega-tg-bot"
+            },
+
+            prj4: { 
+                title: "src17-tg-bot",
+                content: " A Telegram bot for real-time monitoring of stocks, cryptocurrencies, and currencies. Search for any ticker and manage your personal watchlist. ", 
+                stack: ["Python 3.9+", "Aiogram", "FastAPI", "Uvicorn", "yfinance API", "pandas", "SQLAlchemy", "PostgreSQL", "Vercel Serverless"],
+                repoUrl: "https://github.com/shytyk-develop/src17-tg-bot"
+            },
+
+            prj5: { 
+                title: "video-2-webm", 
+                content: "A simple and fast FFmpeg-based CLI utility for converting any video format into high-quality WebM files with minimal file size.", 
+                stack: ["Subprocess Management", "Python", "FFmpeg", "CLI", "Batch Processing"],
+                repoUrl: "https://github.com/shytyk-develop/video2webm"
+            },
+
+            prj6: { 
+                title: "safely-chat", 
+                content: "SafeLy Chat: Modern privacy-focused messenger. Built with FastAPI and Next.js. Features private messaging, secure API authentication, and soft-delete functionality.", 
+                stack: ["Python", "TypeScript", "FastAPI", "SQLAlchemy", "SQLAlchemy", "PostgreSQL", "JWT", "Next.js", "Uvicorn", "Pydantic", "Tailwind CSS", "Vercel"],
+                repoUrl: "https://github.com/shytyk-develop/safely-chat"
+            },
+        };
+
+        function openDrawer(id) {
+            const prj = projects[id];
+            document.getElementById('drawer-title').innerText = prj.title;
+            document.getElementById('drawer-content').innerText = prj.content;
+            document.getElementById('drawer-stack').innerHTML = prj.stack.map(s => `<span class="text-[var(--accent)] text-[10px] border border-accent px-2 py-1 uppercase">${s}</span>`).join('');
+            const repoLink = document.getElementById('drawer-repo-link');
+            repoLink.href = prj.repoUrl || "#";
+            document.getElementById('side-drawer').classList.add('open');
+            refreshIcons();
+        }
+
+        function closeDrawer() { document.getElementById('side-drawer').classList.remove('open'); }
+
+        const startTime = Date.now();
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toTimeString().split(' ')[0];
+            const diff = Math.floor((Date.now() - startTime) / 1000);
+            const h = String(Math.floor(diff / 3600)).padStart(2, '0');
+            const m = String(Math.floor((diff % 3600) / 60)).padStart(2, '0');
+            const s = String(diff % 60).padStart(2, '0');
+            document.getElementById('uptime-display').innerText = `UPTIME: ${h}:${m}:${s}`;
+        }, 1000);
+
+        // PROJECTS KEY GATE
+        function verifyProjectsKey() {
+            const input = document.getElementById('gate-key-input');
+            const errorMsg = document.getElementById('gate-error-msg');
+            const storedKey = sessionStorage.getItem('boot_security_key');
+            const entered = input.value.trim().toUpperCase();
+
+            if (!storedKey) {
+                errorMsg.textContent = 'ERR: Ключ не найден. Перезагрузите страницу.';
+                input.classList.add('error');
+                setTimeout(() => input.classList.remove('error'), 600);
+                return;
+            }
+
+            if (entered === storedKey) {
+                errorMsg.textContent = '';
+                const wrapper = document.getElementById('projects-lock-wrapper');
+                wrapper.classList.add('unlocked');
+                // Показываем тост
+                showToast('ACCESS_GRANTED // JOB_QUEUE_UNLOCKED');
+            } else {
+                errorMsg.textContent = `INVALID_KEY // ACCESS_DENIED`;
+                input.classList.add('error');
+                setTimeout(() => input.classList.remove('error'), 600);
+                input.value = '';
+                input.focus();
+            }
+        }
+
+        // Enter в поле ключа
+        document.addEventListener('DOMContentLoaded', () => {
+            const gateInput = document.getElementById('gate-key-input');
+            if (gateInput) {
+                gateInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') verifyProjectsKey();
+                });
+                // Авто-uppercase при вводе
+                gateInput.addEventListener('input', (e) => {
+                    e.target.value = e.target.value.toUpperCase();
+                });
+            }
+        });
+
+        function openTerminalWithWelcome() {
+            const term = document.getElementById('terminal-window');
+            if (!term.classList.contains('expanded')) toggleTerminal();
+            printToTerminal([
+                "SESSION_INITIALIZED: Granted access to ARCHITECT_OS.",
+                "Добро пожаловать в систему.",
+                "INFO: Вы можете использовать терминал для навигации по сайту.",
+                "Пример: введите 'ls' для списка разделов или 'cd projects'."
+            ]);
+        }
+
+        function showToast(message) {
+            const container = document.getElementById('toast-container');
+            const text = document.getElementById('toast-text');
+            text.innerText = message;
+            container.style.display = 'flex';
+            setTimeout(() => {
+                container.classList.add('show');
+                refreshIcons();
+            }, 10);
+            setTimeout(() => {
+                container.classList.remove('show');
+                setTimeout(() => {
+                    container.style.display = 'none';
+                }, 300);
+            }, 3000);
+        }
+
+        function copyEmail(email) {
+            const temp = document.createElement('textarea');
+            temp.value = email;
+            document.body.appendChild(temp);
+            temp.select();
+            document.execCommand('copy');
+            document.body.removeChild(temp);
+            showToast('EMAIL_COPIED_TO_CLIPBOARD');
+        }
+
+        const whoamiLines = [
+            { text: "building async APIs with FastAPI" },
+            { text: "designing database schemas (PostgreSQL, MySQL, MongoDB, SQLite)" },
+            { text: "writing clean, maintainable backend logic" },
+            { text: "optimizing performance & reducing latency" },
+            { text: "deploying full-stack apps (Docker / CI-CD)" }
+        ];
+        const whoamiContainer = document.getElementById("whoami");
+        let whoamiIndex = 0;
+        function typeWhoami() {
+            if (whoamiIndex >= whoamiLines.length) return;
+            const el = document.createElement("div");
+            el.className = "text-[var(--accent)] line";
+            el.textContent = whoamiLines[whoamiIndex].text;
+            whoamiContainer.appendChild(el);
+            setTimeout(() => el.classList.add("show"), 20);
+            whoamiIndex++;
+            setTimeout(typeWhoami, 500);
+        }
+        typeWhoami();
+
+        // СКРОЛ АНИМАЦИЯ
+        const scrollAnimationSystem = {
+            // Конфигурация Intersection Observer
+            observerConfig: {
+                root: null,
+                rootMargin: '0px 0px -100px 0px', // Триггер за 100px до нижнего края viewport
+                threshold: 0.1
+            },
+
+            // Инициализация системы
+            init() {
+                this.observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            this.animateElement(entry.target);
+                            this.observer.unobserve(entry.target);
+                        }
+                    });
+                }, this.observerConfig);
+
+                // Найти все элементы с атрибутом data-scroll-animate
+                document.querySelectorAll('[data-scroll-animate]').forEach(el => {
+                    // Проверяем, уже ли элемент видим на экране
+                    const rect = el.getBoundingClientRect();
+                    const isInitiallyVisible = rect.top < window.innerHeight && rect.bottom > 0;
+                    
+                    if (isInitiallyVisible) {
+                        // Если элемент уже видим, добавляем класс initial-visible
+                        el.classList.add('initial-visible');
+                    } else {
+                        // Иначе наблюдаем за элементом
+                        this.observer.observe(el);
+                    }
+                });
+            },
+
+            // Анимирование элемента при появлении в viewport
+            animateElement(element) {
+                const type = element.getAttribute('data-scroll-animate');
+                
+                if (type === 'section') {
+                    // Для секций: анимировать саму секцию + стейджировать детей
+                    element.classList.add('visible');
+                    this.staggerChildren(element);
+                } else {
+                    // Для остальных элементов просто добавить класс visible
+                    element.classList.add('visible');
+                }
+            },
+
+            // Стейджированная анимация детей
+            staggerChildren(parentElement) {
+                const children = parentElement.querySelectorAll('[data-scroll-animate]');
+                let delay = 0;
+
+                children.forEach((child) => {
+                    // Пропускаем саму родительскую секцию и сразу переходим к прямым детям
+                    if (child === parentElement) return;
+
+                    // Используем requestAnimationFrame для плавной стейджировки
+                    setTimeout(() => {
+                        child.classList.add('visible');
+                    }, delay);
+
+                    delay += 60; // 60ms между анимациями элементов (более сдержано)
+                });
+            }
+        };
+
+        // Инициализируем систему когда DOM готов
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                scrollAnimationSystem.init();
+            });
+        } else {
+            scrollAnimationSystem.init();
+        }
+
+        window.reinitializeScrollAnimations = function() {
+            scrollAnimationSystem.init();
+        };
+    </script>
+</body>
+</html>
