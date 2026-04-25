@@ -109,7 +109,7 @@
             pointer-events: none;
         }
 
-        /* ПОЛНОЭКРАННАЯ СЕКЦИЯ REVEAL */
+        /* FULLSCREEN REVEAL SECTION */
         #reveal-section {
             position: relative;
             height: 160px;
@@ -154,17 +154,17 @@
             justify-content: center;
         }
 
-        /* Мобильный вид: эффект фонарика по скроллу */
+        /* Mobile view: flashlight effect on scroll */
         @media (max-width: 767px) {
             .reveal-text::after {
                 opacity: 1;
-                /* Используем радиальный градиент-фонарик, координата X которого обновляется из JS */
+                /* Use a radial gradient flashlight whose X coordinate is updated from JS */
                 -webkit-mask-image: radial-gradient(circle 65px at var(--x, -100%) var(--y, 50%), black 20%, transparent 100%);
                 mask-image: radial-gradient(circle 65px at var(--x, -100%) var(--y, 50%), black 20%, transparent 100%);
             }
         }
 
-        /* Десктопный вид: фонарик по наведению мыши */
+        /* Desktop view: flashlight on hover */
         @media (min-width: 768px) {
             .reveal-text::after {
                 opacity: 0;
@@ -194,7 +194,7 @@
         .editor-tabs {
             display: flex;
             background: var(--bg);
-            overflow-x: auto; /* Адаптив: горизонтальный скролл для вкладок */
+            overflow-x: auto; /* Responsive: horizontal scroll for tabs */
         }
         .editor-tab {
             padding: 8px 20px;
@@ -205,7 +205,7 @@
             transition: all 0.2s;
             background: var(--editor-bg);
             text-transform: lowercase;
-            white-space: nowrap; /* Запрет переноса на мобильных */
+            white-space: nowrap; /* Prevent wrapping on mobile */
             flex-shrink: 0;
         }
         .editor-tab.active {
@@ -281,15 +281,15 @@
             position: fixed;
             top: 0;
             right: -100%;
-            width: 100%; /* Адаптив: 100% на мобильных */
-            max-width: 450px; /* Ограничение для десктопа */
+            width: 100%; /* Responsive: 100% on mobile */
+            max-width: 450px; /* Desktop cap */
             height: 100%;
             background: var(--card-bg);
             backdrop-filter: blur(10px);
             border-left: 1px solid var(--border);
             z-index: 1000;
             transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            padding: 24px; /* Меньший паддинг для мобильных */
+            padding: 24px; /* Smaller padding for mobile */
             display: flex;
             flex-direction: column;
             color: var(--text-main);
@@ -299,7 +299,7 @@
         }
         #side-drawer.open { right: 0; }
 
-        /* ТЕРМИНАЛ 3.0 */
+        /* TERMINAL 3.0 */
         #terminal-window {
             position: fixed;
             bottom: 40px;
@@ -319,7 +319,7 @@
             height: 280px;
         }
         @media (max-width: 768px) {
-            #terminal-window.expanded { height: 220px; } /* На мобильных терминал чуть ниже */
+            #terminal-window.expanded { height: 220px; } /* On mobile the terminal is slightly lower */
         }
 
         .terminal-window-header {
@@ -442,7 +442,7 @@
             color: var(--accent);
         }
 
-        /* --- ЗАГРУЗОЧНЫЙ ТЕРМИНАЛ --- */
+        /* --- BOOT TERMINAL --- */
         #boot-screen {
             position: fixed; inset: 0; background: #000; z-index: 10000;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -481,7 +481,7 @@
         }
         .highlight-cmd { color: var(--highlight); font-weight: bold; }
         .text-error { color: var(--danger); font-weight: bold; }
-        /* Цветовая палитра для терминала */
+        /* Terminal color palette */
         .boot-dim   { color: #444; }
         .boot-ok    { color: #4AF626; }
         .boot-cmd   { color: #38bdf8; font-weight: bold; }
@@ -603,12 +603,12 @@
         }
 
         /* SCROLL ANIMATIONS SYSTEM */
-        /* Базовые состояния для анимаций */
+        /* Base animation states */
         [data-scroll-animate] {
             opacity: 0;
         }
 
-        /* Раздел появляется снизу */
+        /* Section appears from bottom */
         [data-scroll-animate="section"] {
             transform: translateY(15px);
             animation: none;
@@ -617,7 +617,7 @@
             animation: slideUpFade 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
         }
 
-        /* Элемент в списке (стейджеренный) */
+        /* List item (staggered) */
         [data-scroll-animate="item"] {
             transform: translateY(12px);
             animation: none;
@@ -626,7 +626,7 @@
             animation: slideUpFade 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
         }
 
-        /* Карточка (контакты, stack) */
+        /* Card (contacts, stack) */
         [data-scroll-animate="card"] {
             transform: translateY(12px) scale(0.98);
             animation: none;
@@ -635,7 +635,7 @@
             animation: slideUpScale 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
         }
 
-        /* Текстовый контент */
+        /* Text content */
         [data-scroll-animate="text"] {
             transform: translateY(10px);
             animation: none;
@@ -644,7 +644,7 @@
             animation: slideUpFade 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
         }
 
-        /* Заголовок секции */
+        /* Section heading */
         [data-scroll-animate="heading"] {
             transform: translateX(-10px);
             opacity: 0;
@@ -654,7 +654,7 @@
             animation: slideInFromLeftFade 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
         }
 
-        /* Кнопки */
+        /* Buttons */
         [data-scroll-animate="button"] {
             transform: translateY(10px);
             animation: none;
@@ -697,12 +697,12 @@
             }
         }
 
-        /* Когда элемент уже виден, убираем дефолтный opacity */
+        /* When element is already visible, remove default opacity */
         [data-scroll-animate].visible {
             opacity: 1;
         }
 
-        /* Исключаем анимации для элементов, которые уже видны на загрузке */
+        /* Skip animations for elements already visible on load */
         [data-scroll-animate].initial-visible {
             opacity: 1;
             transform: none;
@@ -809,7 +809,7 @@
             min-height: 14px;
             text-align: center;
         }
-        /* Тонкая анимация разблока — только граница секции */
+        /* Subtle unlock animation — only section border */
         @keyframes unlock-border {
             0%   { outline: 1px solid transparent; }
             30%  { outline: 1px solid var(--accent); }
@@ -830,7 +830,7 @@
     <div id="content-wrapper">
         <div class="scanline"></div>
 
-        <!-- ТЕРМИНАЛ ЗАГРУЗКИ -->
+        <!-- LOADING TERMINAL -->
         <div id="boot-screen">
             <div id="boot-terminal">
                 <div id="boot-terminal-header">
@@ -843,7 +843,7 @@
                     <span id="boot-session">Session: 0x8F2A</span>
                 </div>
                 <div id="boot-terminal-body">
-                    <!-- Контент добавляется динамически -->
+                    <!-- Content is loaded dynamically -->
                 </div>
             </div>
             <div id="boot-welcome-overlay">
@@ -851,7 +851,7 @@
             </div>
         </div>
 
-        <!-- Сайд-бар -->
+        <!-- Side drawer -->
         <div id="side-drawer" class="sharp">
             <div class="flex-grow overflow-y-auto">
                 <div class="flex justify-between items-start mb-6 md:mb-8">
@@ -863,7 +863,7 @@
                 <div id="drawer-content" class="text-xs md:text-sm space-y-6 text-[var(--text-main)] leading-relaxed mb-8"></div>
                 
                 <div class="mt-8 md:mt-12 pt-4 pl-2 pr-2 pb-2 border-t border-strict">
-                    <div class="text-[var(--text-dim)] text-[9px] md:text-[10px] mb-4 uppercase">Технологический стек:</div>
+                    <div class="text-[var(--text-dim)] text-[9px] md:text-[10px] mb-4 uppercase">Tech stack:</div>
                     <div id="drawer-stack" class="flex flex-wrap gap-2"></div>
                 </div>
             </div>
@@ -876,7 +876,7 @@
             </div>
         </div>
 
-        <!-- Уведомление -->
+        <!-- Notification -->
         <div id="toast-container">
             <div id="toast-msg" class="sharp">
                 <i data-lucide="check" class="w-3 h-3"></i>
@@ -884,7 +884,7 @@
             </div>
         </div>
 
-        <!-- Хедер -->
+        <!-- Header -->
         <header class="flex justify-between items-center px-4 md:px-6 h-14 border-b border-strict fixed top-0 w-full bg-[var(--header-bg)] backdrop-blur-sm z-50 transition-colors duration-300">
             <div class="flex items-center gap-2 md:gap-4">
                 <span class="font-bold tracking-tighter text-[var(--accent)] cursor-default text-sm md:text-base">SHYTYK_DEV</span>
@@ -907,7 +907,7 @@
 
         <main class="pt-24 md:pt-24 pb-12">
             
-            <!-- Герой-секция -->
+            <!-- Hero section -->
             <section id="home" class="max-w-6xl mx-auto px-4 md:px-6 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 mb-16 md:mb-24 mt-4" data-scroll-animate="section">
                 <div data-scroll-animate="text">
                     <div class="text-[var(--text-dim)] text-[9px] md:text-[10px] mb-3 md:mb-4 uppercase">Identity_Verified // ID: 0x7E3A</div>
@@ -972,7 +972,7 @@
                 </div>
             </section>
 
-            <!-- ПОЛНОЭКРАННЫЙ РАЗДЕЛИТЕЛЬ -->
+            <!-- FULLSCREEN DIVIDER -->
             <section id="reveal-section">
                 <h2 class="reveal-text">BUILDING INVISIBLE</h2>
             </section>
@@ -1231,7 +1231,7 @@
   <span class="code-key">pattern</span>: <span class="code-string">"Domain Driven Design (DDD)"</span>
   <span class="code-key">approach</span>: <span class="code-string">"Async-First (Non-blocking I/O)"</span>
 
-<span class="code-key">philosophy</span>: <span class="code-string">"Простота сложнее сложности. Избегаю оверинжиниринга, фокусируясь на надежности бизнес-процессов."</span></pre>
+<span class="code-key">philosophy</span>: <span class="code-string">"Simplicity is harder than complexity. I avoid overengineering by focusing on business process reliability."</span></pre>
                     </div>
                 </div>
                 <div class="mt-3 md:mt-4 flex justify-between items-center text-[8px] md:text-[9px] text-[var(--text-dim)] uppercase px-2">
@@ -1308,7 +1308,7 @@
 
         </main>
 
-        <!-- ОКНО ТЕРМИНАЛА -->
+        <!-- TERMINAL WINDOW -->
         <div id="terminal-window" class="border-strict">
             <div class="terminal-window-header">
                 <div class="flex items-center gap-2">
@@ -1332,7 +1332,7 @@
             </div>
         </div>
 
-        <!-- ТЕРМИНАЛЬНАЯ ПАНЕЛЬ -->
+        <!-- TERMINAL PANEL -->
         <footer class="terminal-bar">
             <span class="text-[var(--accent)] text-[10px] md:text-xs font-bold whitespace-nowrap" id="cli-prompt">root@architect:~$</span>
             <div class="cli-container">
@@ -1347,14 +1347,14 @@
     </div>
 
     <script>
-        // Принудительная отрисовка иконок Lucide
+        // Force redraw Lucide icons
         function refreshIcons() {
             if (window.lucide) {
                 window.lucide.createIcons();
             }
         }
 
-        // ТЕМА
+        // THEME
         function toggleTheme() {
             const currentTheme = document.documentElement.getAttribute('data-theme');
             const newTheme = currentTheme === 'light' ? 'dark' : 'light';
@@ -1373,7 +1373,7 @@
             refreshIcons();
         }
 
-        // ЛОГИКА КУРСОРA
+        // CURSOR LOGIC
         const dot = document.getElementById('cursor-dot');
         const ring = document.getElementById('cursor-ring');
         let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
@@ -1445,7 +1445,7 @@
         document.documentElement.setAttribute('data-theme', savedTheme);
         updateThemeIcon(savedTheme);
 
-        // МАТРИЦА
+        // MATRIX
         const canvas = document.getElementById('bg-canvas');
         const ctx = canvas.getContext('2d');
         let width = canvas.width = window.innerWidth;
@@ -1478,7 +1478,7 @@
             for (let i = 0; i < columns; i++) drops[i] = Math.random() * -100;
         });
 
-// ЗАГРУЗОЧНЫЙ ТЕРМИНАЛ
+// BOOT TERMINAL
         const bootScreen = document.getElementById('boot-screen');
         const bootTerminalEl = document.getElementById('boot-terminal');
         const bootBody = document.getElementById('boot-terminal-body');
@@ -1486,18 +1486,18 @@
 
         const bootSequence = [
             { type: 'text', content: '<span class="boot-dim">──────────────────────────────────────────</span>' },
-            { type: 'text', content: '<span class="boot-ok">[ OK ]</span> <span class="boot-white">Загрузка ядра ARCHITECT_OS...</span>' },
-            { type: 'text', content: '<span class="boot-ok">[ OK ]</span> <span class="boot-white">Монтирование зашифрованной файловой системы...</span>' },
-            { type: 'text', content: '<span class="boot-ok">[ OK ]</span> <span class="boot-white">Загрузка модулей окружения...</span>' },
-            { type: 'text', content: '<span class="boot-ok">[ OK ]</span> <span class="boot-white">Установка защищенного туннеля...</span>' },
-            { type: 'text', content: '<span class="boot-ok">[ OK ]</span> <span class="boot-white">Система идентификации инициализирована.</span>' },
+            { type: 'text', content: '<span class="boot-ok">[ OK ]</span> <span class="boot-white">Loading ARCHITECT_OS core...</span>' },
+            { type: 'text', content: '<span class="boot-ok">[ OK ]</span> <span class="boot-white">Mounting encrypted file system...</span>' },
+            { type: 'text', content: '<span class="boot-ok">[ OK ]</span> <span class="boot-white">Loading environment modules...</span>' },
+            { type: 'text', content: '<span class="boot-ok">[ OK ]</span> <span class="boot-white">Establishing secure tunnel...</span>' },
+            { type: 'text', content: '<span class="boot-ok">[ OK ]</span> <span class="boot-white">Authentication system initialized.</span>' },
             { type: 'text', content: '<span class="boot-dim">──────────────────────────────────────────</span>' },
             { type: 'text', content: '' },
-            { type: 'text', content: '<span class="boot-warn">[ AUTH ]</span> <span class="boot-white">Для доступа к системе требуется авторизация.</span>' },
-            { type: 'text', content: '<span class="boot-white">  Для вашей сессии будет создан разовый <span class="boot-cmd">КЛЮЧ_БЕЗОПАСНОСТИ</span>.</span>' },
-            { type: 'text', content: '<span class="boot-white">  Этот ключ понадобится для доступа к разделу проектов.</span>' },
+            { type: 'text', content: '<span class="boot-warn">[ AUTH ]</span> <span class="boot-white">Authorization is required to access the system.</span>' },
+            { type: 'text', content: '<span class="boot-white">  A one-time <span class="boot-cmd">SECURITY_KEY</span> will be generated for your session.</span>' },
+            { type: 'text', content: '<span class="boot-white">  This key will be needed to access the projects section.</span>' },
             { type: 'text', content: '' },
-            { type: 'text', content: '<span class="boot-white">Продолжить и создать ключ?  [<span class="boot-cmd">y</span> / <span class="boot-cmd-2">n</span>]</span>' },
+            { type: 'text', content: '<span class="boot-white">Continue and create key?  [<span class="boot-cmd">y</span> / <span class="boot-cmd-2">n</span>]</span>' },
             { type: 'input' }
         ];
 
@@ -1538,7 +1538,7 @@
                     } else {
                         const err = document.createElement('div');
                         err.className = 'boot-warn';
-                        err.textContent = '  Ожидается "y" или "n". Попробуйте снова.';
+                        err.textContent = '  Expected "y" or "n". Try again.';
                         bootBody.appendChild(err);
                         input.disabled = false;
                         input.value = '';
@@ -1550,10 +1550,10 @@
 
         async function startKeyGeneration() {
             const steps = [
-                'Сбор энтропии из аппаратного пула...',
-                'Генерация 128-битного вектора сессии...',
-                'Вычисление контрольной суммы ключа...',
-                'Финализация КЛЮЧА_БЕЗОПАСНОСТИ...'
+                'Gathering entropy from the hardware pool...',
+                'Generating 128-bit session vector...',
+                'Calculating key checksum...',
+                'Finalizing SECURITY_KEY...'
             ];
             for (let s of steps) {
                 const div = document.createElement('div');
@@ -1565,7 +1565,7 @@
 
             const key = Array.from({length: 16}, () => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'[Math.floor(Math.random() * 36)]).join('');
 
-            // Разделитель
+            // Separator
             const sep = document.createElement('div');
             sep.innerHTML = '<span class="boot-dim">──────────────────────────────────────────</span>';
             bootBody.appendChild(sep);
@@ -1574,16 +1574,16 @@
             keyBox.className = 'boot-key-box opacity-0 transition-opacity duration-700';
             keyBox.innerHTML = `
                 <div class="boot-key-value">${key}</div>
-                <button id="copy-boot-key">КОПИРОВАТЬ КЛЮЧ</button>
+                <button id="copy-boot-key">COPY KEY</button>
             `;
             bootBody.appendChild(keyBox);
             bootBody.scrollTop = bootBody.scrollHeight;
             setTimeout(() => keyBox.classList.remove('opacity-0'), 10);
 
-            // Предупреждение — сохрани ключ
+            // Warning — save the key
             const hint = document.createElement('div');
             hint.className = 'boot-key-hint';
-            hint.innerHTML = `<span class="boot-warn">⚠</span> <span>Сохраните этот ключ — он понадобится для разблокировки раздела проектов. Повторно он не отобразится.</span>`;
+            hint.innerHTML = `<span class="boot-warn">⚠</span> <span>Save this key — it will be needed to unlock the projects section. It will not be shown again.</span>`;
             bootBody.appendChild(hint);
             bootBody.scrollTop = bootBody.scrollHeight;
 
@@ -1598,14 +1598,14 @@
 
                 sessionStorage.setItem('boot_security_key', key);
 
-                btn.textContent = 'СКОПИРОВАНО ✓';
+                btn.textContent = 'COPIED ✓';
                 btn.style.background = '#4AF626';
                 btn.style.color = '#000';
                 btn.style.borderColor = '#4AF626';
 
                 const success = document.createElement('div');
                 success.style.marginTop = '8px';
-                success.innerHTML = `<span class="boot-ok">[ OK ]</span> <span class="boot-white">Ключ скопирован. Инициализация сессии...</span>`;
+                success.innerHTML = `<span class="boot-ok">[ OK ]</span> <span class="boot-white">Key copied. Initializing session...</span>`;
                 bootBody.appendChild(success);
                 bootBody.scrollTop = bootBody.scrollHeight;
                 setTimeout(finalizeBoot, 1200);
@@ -1615,14 +1615,14 @@
         function blockBootAccess() {
             const div = document.createElement('div');
             div.style.cssText = 'margin-top:12px;padding:14px 16px;border:1px solid #3a1010;background:rgba(239,68,68,0.06)';
-            div.innerHTML = `<div style="color:#ef4444;font-weight:bold;margin-bottom:6px;letter-spacing:0.1em">ДОСТУП_ОТКЛОНЕН</div>
-                <span style="color:#888;font-size:11px">Сессия прервана пользователем. Обновите страницу, чтобы попробовать снова.</span>`;
+            div.innerHTML = `<div style="color:#ef4444;font-weight:bold;margin-bottom:6px;letter-spacing:0.1em">ACCESS_DENIED</div>
+                <span style="color:#888;font-size:11px">Session interrupted by user. Refresh the page to try again.</span>`;
             bootBody.appendChild(div);
             bootBody.scrollTop = bootBody.scrollHeight;
         }
 
         function finalizeBoot() {
-            // Принудительный скролл вверх для мобилок перед исчезновением экрана
+            // Force scroll up for mobile before the screen hides
             window.scrollTo(0, 0);
             document.documentElement.scrollTop = 0;
             document.body.scrollTop = 0;
@@ -1633,7 +1633,7 @@
                 bootWelcome.classList.add('show');
                 setTimeout(() => {
                     bootScreen.style.opacity = '0';
-                    // Повторный скролл на случай, если браузер дернул страницу во время анимации
+                    // Re-scroll in case the browser jolted the page during animation
                     window.scrollTo(0, 0);
                     setTimeout(() => {
                         bootScreen.style.display = 'none';
@@ -1644,17 +1644,17 @@
         }
 
         window.onload = () => {
-            // Замена "Session" на "Сессия"
-            document.getElementById('boot-session').innerText = `Сессия: 0x${Math.floor(Math.random()*65535).toString(16).toUpperCase()}`;
+            // Replace "Session" label
+            document.getElementById('boot-session').innerText = `Session: 0x${Math.floor(Math.random()*65535).toString(16).toUpperCase()}`;
             runBootSequence();
             refreshIcons();
         };
 
-        // ЭФФЕКТ ФОНАРИКА (ДЕСКТОП И МОБИЛЬНЫЕ)
+        // FLASHLIGHT EFFECT (DESKTOP AND MOBILE)
         const revealText = document.querySelector('.reveal-text');
         const revealSection = document.getElementById('reveal-section');
 
-        // Для десктопа: эффект фонарика по наведению
+        // For desktop: flashlight effect on hover
         revealSection.addEventListener('mousemove', (e) => {
             if (window.innerWidth >= 768) {
                 const rect = revealText.getBoundingClientRect();
@@ -1663,22 +1663,22 @@
             }
         });
 
-        // Для мобилок: проявление радиальным фонариком слева направо по скроллу
+        // For mobile: reveal with radial flashlight left to right on scroll
         window.addEventListener('scroll', () => {
             if (window.innerWidth < 768) {
                 const rect = revealSection.getBoundingClientRect();
                 const windowHeight = window.innerHeight;
                 
-                // Берем за основу центр секции, чтобы эффект начинался когда она уже показалась
+                // Use the section center as the basis so the effect starts when it is visible
                 const sectionCenterY = rect.top + rect.height / 2;
                 
-                // Начинаем: когда центр секции прошел 80% экрана снизу
+                // Start when the section center passes 80% from the bottom of the viewport
                 const start = windowHeight * 0.8;
-                // Заканчиваем: когда центр секции дошел до 20% высоты экрана сверху
+                // End when the section center reaches 20% from the top of the viewport
                 const end = windowHeight * 0.2;
                 
-                // Считаем прогресс по координате X от -30% (полностью за левым краем) 
-                // до 130% (полностью за правым краем)
+                // Calculate progress along X from -30% (fully left of edge) 
+                // to 130% (fully right of edge)
                 let progress = ((start - sectionCenterY) / (start - end)) * 100;
                 progress = Math.max(-30, Math.min(130, progress));
                 
@@ -1689,7 +1689,7 @@
         
         window.dispatchEvent(new Event('scroll'));
 
-        // КОНТЕНТ BLUEPRINT
+        // BLUEPRINT CONTENT
         const bluePrintContent = {
             design: `<span class="code-comment"># System Architecture & Design Philosophy</span>
 <span class="code-key">architecture_patterns</span>:
@@ -1727,7 +1727,7 @@
 <span class="code-key">future_proofing</span>: <span class="code-string">"Designing DB schemas with indexing and partitioning in mind for High-Load potential."</span>`
         };
 
-        // ТЕРМИНАЛ LOGIC
+        // TERMINAL LOGIC
         const terminalWindow = document.getElementById('terminal-window');
         const terminalBody = document.getElementById('terminal-body');
         const termToggleBtn = document.getElementById('term-toggle-btn');
@@ -1780,15 +1780,15 @@
         const commands = {
             'help': () => printToTerminal([
                 "COMMANDS_MANUAL:",
-                "  cd [dir]  - Перейти в раздел (home, stack, projects, spec, contact)",
-                "  ls        - Показать доступные разделы",
-                "  whoami    - Информация об архитекторе",
-                "  theme     - Сменить цветовую схему (light/dark)",
-                "  date      - Текущее время системы",
-                "  clear     - Очистить консоль",
-                "  help      - Показать эту справку"
+                "  cd [dir]  - Navigate to section (home, stack, projects, spec, contact)",
+                "  ls        - Show available sections",
+                "  whoami    - Architect information",
+                "  theme     - Toggle the color scheme (light/dark)",
+                "  date      - Current system time",
+                "  clear     - Clear the console",
+                "  help      - Show this help"
             ]),
-            'ls': () => printToTerminal(["Разделы системы:", ...availableSections.map(s => `  /bin/${s}`)]),
+            'ls': () => printToTerminal(["System sections:", ...availableSections.map(s => `  /bin/${s}`)]),
             'whoami': () => printToTerminal([
                 "IDENT_VERIFIED: Jan Shytyk",
                 "CLASS: Backend_Architect",
@@ -1809,7 +1809,7 @@
                     cliPrompt.innerHTML = `root@architect:~/${target}$`;
                     printToTerminal([`PATH_UPDATE: ~/${target}... OK`]);
                 } else {
-                    printToTerminal([`ERROR: Раздел '${target || ''}' не существует. Используйте 'ls'.`], true);
+                    printToTerminal([`ERROR: Section '${target || ''}' does not exist. Use 'ls'.`], true);
                 }
             }
         };
@@ -1863,7 +1863,7 @@
                 if (commands[cmd.toLowerCase()]) {
                     commands[cmd.toLowerCase()](args);
                 } else {
-                    printToTerminal([`ERROR: Команда '${cmd}' не распознана.`], true);
+                    printToTerminal([`ERROR: Command '${cmd}' not recognized.`], true);
                 }
             }
         });
@@ -1968,7 +1968,7 @@
             const entered = input.value.trim().toUpperCase();
 
             if (!storedKey) {
-                errorMsg.textContent = 'ERR: Ключ не найден. Перезагрузите страницу.';
+                errorMsg.textContent = 'ERR: Key not found. Reload the page.';
                 input.classList.add('error');
                 setTimeout(() => input.classList.remove('error'), 600);
                 return;
@@ -1978,7 +1978,7 @@
                 errorMsg.textContent = '';
                 const wrapper = document.getElementById('projects-lock-wrapper');
                 wrapper.classList.add('unlocked');
-                // Показываем тост
+                // Show toast
                 showToast('ACCESS_GRANTED // JOB_QUEUE_UNLOCKED');
             } else {
                 errorMsg.textContent = `INVALID_KEY // ACCESS_DENIED`;
@@ -1989,14 +1989,14 @@
             }
         }
 
-        // Enter в поле ключа
+        // Enter in key field
         document.addEventListener('DOMContentLoaded', () => {
             const gateInput = document.getElementById('gate-key-input');
             if (gateInput) {
                 gateInput.addEventListener('keydown', (e) => {
                     if (e.key === 'Enter') verifyProjectsKey();
                 });
-                // Авто-uppercase при вводе
+                // Auto-uppercase on input
                 gateInput.addEventListener('input', (e) => {
                     e.target.value = e.target.value.toUpperCase();
                 });
@@ -2008,9 +2008,9 @@
             if (!term.classList.contains('expanded')) toggleTerminal();
             printToTerminal([
                 "SESSION_INITIALIZED: Granted access to ARCHITECT_OS.",
-                "Добро пожаловать в систему.",
-                "INFO: Вы можете использовать терминал для навигации по сайту.",
-                "Пример: введите 'ls' для списка разделов или 'cd projects'."
+                "Welcome to the system.",
+                "INFO: You can use the terminal to navigate the site.",
+                "Example: type 'ls' for a list of sections or 'cd projects'."
             ]);
         }
 
@@ -2062,16 +2062,16 @@
         }
         typeWhoami();
 
-        // СКРОЛ АНИМАЦИЯ
+        // SCROLL ANIMATION
         const scrollAnimationSystem = {
-            // Конфигурация Intersection Observer
+            // Intersection Observer configuration
             observerConfig: {
                 root: null,
-                rootMargin: '0px 0px -100px 0px', // Триггер за 100px до нижнего края viewport
+                rootMargin: '0px 0px -100px 0px', // Trigger 100px before the bottom edge of the viewport
                 threshold: 0.1
             },
 
-            // Инициализация системы
+            // Initialize the system
             init() {
                 this.observer = new IntersectionObserver((entries) => {
                     entries.forEach(entry => {
@@ -2082,56 +2082,56 @@
                     });
                 }, this.observerConfig);
 
-                // Найти все элементы с атрибутом data-scroll-animate
+                // Find all elements with data-scroll-animate attribute
                 document.querySelectorAll('[data-scroll-animate]').forEach(el => {
-                    // Проверяем, уже ли элемент видим на экране
+                    // Check whether the element is already visible on screen
                     const rect = el.getBoundingClientRect();
                     const isInitiallyVisible = rect.top < window.innerHeight && rect.bottom > 0;
                     
                     if (isInitiallyVisible) {
-                        // Если элемент уже видим, добавляем класс initial-visible
+                        // If element is already visible, add initial-visible class
                         el.classList.add('initial-visible');
                     } else {
-                        // Иначе наблюдаем за элементом
+                        // Otherwise observe the element
                         this.observer.observe(el);
                     }
                 });
             },
 
-            // Анимирование элемента при появлении в viewport
+            // Animate element when it appears in viewport
             animateElement(element) {
                 const type = element.getAttribute('data-scroll-animate');
                 
                 if (type === 'section') {
-                    // Для секций: анимировать саму секцию + стейджировать детей
+                    // For sections: animate the section itself + stagger children
                     element.classList.add('visible');
                     this.staggerChildren(element);
                 } else {
-                    // Для остальных элементов просто добавить класс visible
+                    // For other elements, just add visible class
                     element.classList.add('visible');
                 }
             },
 
-            // Стейджированная анимация детей
+            // Staggered child animation
             staggerChildren(parentElement) {
                 const children = parentElement.querySelectorAll('[data-scroll-animate]');
                 let delay = 0;
 
                 children.forEach((child) => {
-                    // Пропускаем саму родительскую секцию и сразу переходим к прямым детям
+                    // Skip the parent section and go straight to direct children
                     if (child === parentElement) return;
 
-                    // Используем requestAnimationFrame для плавной стейджировки
+                    // Use requestAnimationFrame for smooth staggering
                     setTimeout(() => {
                         child.classList.add('visible');
                     }, delay);
 
-                    delay += 60; // 60ms между анимациями элементов (более сдержано)
+                    delay += 60; // 60ms between element animations (more restrained)
                 });
             }
         };
 
-        // Инициализируем систему когда DOM готов
+        // Initialize system when DOM is ready
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => {
                 scrollAnimationSystem.init();
