@@ -1478,7 +1478,7 @@
             for (let i = 0; i < columns; i++) drops[i] = Math.random() * -100;
         });
 
-        // ЗАГРУЗОЧНЫЙ ТЕРМИНАЛ
+// ЗАГРУЗОЧНЫЙ ТЕРМИНАЛ
         const bootScreen = document.getElementById('boot-screen');
         const bootTerminalEl = document.getElementById('boot-terminal');
         const bootBody = document.getElementById('boot-terminal-body');
@@ -1486,18 +1486,18 @@
 
         const bootSequence = [
             { type: 'text', content: '<span class="boot-dim">──────────────────────────────────────────</span>' },
-            { type: 'text', content: '<span class="boot-ok">[ OK ]</span> <span class="boot-white">Booting ARCHITECT_OS kernel...</span>' },
-            { type: 'text', content: '<span class="boot-ok">[ OK ]</span> <span class="boot-white">Mounting encrypted filesystem...</span>' },
-            { type: 'text', content: '<span class="boot-ok">[ OK ]</span> <span class="boot-white">Loading environment modules...</span>' },
-            { type: 'text', content: '<span class="boot-ok">[ OK ]</span> <span class="boot-white">Establishing secure tunnel...</span>' },
-            { type: 'text', content: '<span class="boot-ok">[ OK ]</span> <span class="boot-white">Identity framework initialized.</span>' },
+            { type: 'text', content: '<span class="boot-ok">[ OK ]</span> <span class="boot-white">Загрузка ядра ARCHITECT_OS...</span>' },
+            { type: 'text', content: '<span class="boot-ok">[ OK ]</span> <span class="boot-white">Монтирование зашифрованной файловой системы...</span>' },
+            { type: 'text', content: '<span class="boot-ok">[ OK ]</span> <span class="boot-white">Загрузка модулей окружения...</span>' },
+            { type: 'text', content: '<span class="boot-ok">[ OK ]</span> <span class="boot-white">Установка защищенного туннеля...</span>' },
+            { type: 'text', content: '<span class="boot-ok">[ OK ]</span> <span class="boot-white">Система идентификации инициализирована.</span>' },
             { type: 'text', content: '<span class="boot-dim">──────────────────────────────────────────</span>' },
             { type: 'text', content: '' },
-            { type: 'text', content: '<span class="boot-warn">[ AUTH ]</span> <span class="boot-white">Authentication required to access this system.</span>' },
-            { type: 'text', content: '<span class="boot-white">  A one-time <span class="boot-cmd">SECURITY_KEY</span> will be generated for your session.</span>' },
-            { type: 'text', content: '<span class="boot-white">  This key will be required to access the projects section.</span>' },
+            { type: 'text', content: '<span class="boot-warn">[ AUTH ]</span> <span class="boot-white">Для доступа к системе требуется авторизация.</span>' },
+            { type: 'text', content: '<span class="boot-white">  Для вашей сессии будет создан разовый <span class="boot-cmd">КЛЮЧ_БЕЗОПАСНОСТИ</span>.</span>' },
+            { type: 'text', content: '<span class="boot-white">  Этот ключ понадобится для доступа к разделу проектов.</span>' },
             { type: 'text', content: '' },
-            { type: 'text', content: '<span class="boot-white">Continue and generate your key?  [<span class="boot-cmd">y</span> / <span class="boot-cmd-2">n</span>]</span>' },
+            { type: 'text', content: '<span class="boot-white">Продолжить и создать ключ?  [<span class="boot-cmd">y</span> / <span class="boot-cmd-2">n</span>]</span>' },
             { type: 'input' }
         ];
 
@@ -1538,7 +1538,7 @@
                     } else {
                         const err = document.createElement('div');
                         err.className = 'boot-warn';
-                        err.textContent = '  Expected "y" or "n". Please try again.';
+                        err.textContent = '  Ожидается "y" или "n". Попробуйте снова.';
                         bootBody.appendChild(err);
                         input.disabled = false;
                         input.value = '';
@@ -1550,10 +1550,10 @@
 
         async function startKeyGeneration() {
             const steps = [
-                'Collecting entropy from hardware pool...',
-                'Generating 128-bit session vector...',
-                'Computing key checksum...',
-                'Finalizing SECURITY_KEY...'
+                'Сбор энтропии из аппаратного пула...',
+                'Генерация 128-битного вектора сессии...',
+                'Вычисление контрольной суммы ключа...',
+                'Финализация КЛЮЧА_БЕЗОПАСНОСТИ...'
             ];
             for (let s of steps) {
                 const div = document.createElement('div');
@@ -1574,7 +1574,7 @@
             keyBox.className = 'boot-key-box opacity-0 transition-opacity duration-700';
             keyBox.innerHTML = `
                 <div class="boot-key-value">${key}</div>
-                <button id="copy-boot-key">COPY KEY</button>
+                <button id="copy-boot-key">КОПИРОВАТЬ КЛЮЧ</button>
             `;
             bootBody.appendChild(keyBox);
             bootBody.scrollTop = bootBody.scrollHeight;
@@ -1583,7 +1583,7 @@
             // Предупреждение — сохрани ключ
             const hint = document.createElement('div');
             hint.className = 'boot-key-hint';
-            hint.innerHTML = `<span class="boot-warn">⚠</span> <span>Save this key — you'll need it to unlock the projects section. It won't be shown again.</span>`;
+            hint.innerHTML = `<span class="boot-warn">⚠</span> <span>Сохраните этот ключ — он понадобится для разблокировки раздела проектов. Повторно он не отобразится.</span>`;
             bootBody.appendChild(hint);
             bootBody.scrollTop = bootBody.scrollHeight;
 
@@ -1598,14 +1598,14 @@
 
                 sessionStorage.setItem('boot_security_key', key);
 
-                btn.textContent = 'COPIED ✓';
+                btn.textContent = 'СКОПИРОВАНО ✓';
                 btn.style.background = '#4AF626';
                 btn.style.color = '#000';
                 btn.style.borderColor = '#4AF626';
 
                 const success = document.createElement('div');
                 success.style.marginTop = '8px';
-                success.innerHTML = `<span class="boot-ok">[ OK ]</span> <span class="boot-white">Key copied to clipboard. Initializing your session...</span>`;
+                success.innerHTML = `<span class="boot-ok">[ OK ]</span> <span class="boot-white">Ключ скопирован. Инициализация сессии...</span>`;
                 bootBody.appendChild(success);
                 bootBody.scrollTop = bootBody.scrollHeight;
                 setTimeout(finalizeBoot, 1200);
@@ -1615,19 +1615,26 @@
         function blockBootAccess() {
             const div = document.createElement('div');
             div.style.cssText = 'margin-top:12px;padding:14px 16px;border:1px solid #3a1010;background:rgba(239,68,68,0.06)';
-            div.innerHTML = `<div style="color:#ef4444;font-weight:bold;margin-bottom:6px;letter-spacing:0.1em">ACCESS_DECLINED</div>
-                <span style="color:#888;font-size:11px">Session terminated by user. Refresh the page to try again.</span>`;
+            div.innerHTML = `<div style="color:#ef4444;font-weight:bold;margin-bottom:6px;letter-spacing:0.1em">ДОСТУП_ОТКЛОНЕН</div>
+                <span style="color:#888;font-size:11px">Сессия прервана пользователем. Обновите страницу, чтобы попробовать снова.</span>`;
             bootBody.appendChild(div);
             bootBody.scrollTop = bootBody.scrollHeight;
         }
 
         function finalizeBoot() {
+            // Принудительный скролл вверх для мобилок перед исчезновением экрана
+            window.scrollTo(0, 0);
+            document.documentElement.scrollTop = 0;
+            document.body.scrollTop = 0;
+
             bootTerminalEl.style.opacity = '0';
             bootTerminalEl.style.transform = 'scale(0.97)';
             setTimeout(() => {
                 bootWelcome.classList.add('show');
                 setTimeout(() => {
                     bootScreen.style.opacity = '0';
+                    // Повторный скролл на случай, если браузер дернул страницу во время анимации
+                    window.scrollTo(0, 0);
                     setTimeout(() => {
                         bootScreen.style.display = 'none';
                         refreshIcons();
@@ -1637,7 +1644,8 @@
         }
 
         window.onload = () => {
-            document.getElementById('boot-session').innerText = `Session: 0x${Math.floor(Math.random()*65535).toString(16).toUpperCase()}`;
+            // Замена "Session" на "Сессия"
+            document.getElementById('boot-session').innerText = `Сессия: 0x${Math.floor(Math.random()*65535).toString(16).toUpperCase()}`;
             runBootSequence();
             refreshIcons();
         };
