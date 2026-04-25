@@ -61,10 +61,26 @@
             box-shadow: 0 0 10px var(--accent); opacity: 0; transition: opacity 0.3s ease; 
         }
         #cursor-ring { 
-            position: fixed; top: 0; left: 0; width: 30px; height: 30px; 
-            border: 1px solid var(--accent-glow); border-radius: 50%; 
-            pointer-events: none; z-index: 99999; transform: translate(-50%, -50%); 
-            opacity: 0; transition: width 0.3s ease, height 0.3s ease, opacity 0.3s ease; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 25px; /* Увеличил размер для лучшего вида */
+            height: 25px; 
+            border: 1.5px solid var(--accent-glow); 
+            border-radius: 50%; 
+            pointer-events: none; 
+            z-index: 99999; 
+            transform: translate(-50%, -50%); 
+            opacity: 0; 
+            transition: width 0.3s ease, height 0.3s ease, opacity 0.3s ease; 
+
+            /* ЭФФЕКТ БЛЮРА */
+            background-color: rgba(74, 246, 38, 0.05); /* Добавляем легкий оттенок твоего акцента */
+            backdrop-filter: blur(1.5px); /* Увеличил до 6px для четкого эффекта */
+            -webkit-backdrop-filter: blur(1.5px);
+
+            /* Дополнительно: мягкое свечение по краям самого кольца */
+            box-shadow: 0 0 10px rgba(74, 246, 38, 0.2);
         }
         .cursor-hover #cursor-ring { width: 50px; height: 50px; background-color: rgba(var(--accent), 0.05); border-color: var(--accent); }
 
@@ -847,7 +863,7 @@
                 </div>
             </div>
             <div id="boot-welcome-overlay">
-                <h2 id="boot-welcome-text">WELCOME IN</h2>
+                <h2 id="boot-welcome-text">WELCOME</h2>
             </div>
         </div>
 
