@@ -1,0 +1,56 @@
+.editor-window {
+  background: var(--editor-bg);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  transition: background-color 0.4s ease, border-color 0.4s ease;
+}
+.editor-header {
+  background: var(--bg);
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+}
+.editor-tabs {
+  display: flex;
+  background: var(--bg);
+  overflow-x: auto;
+}
+.editor-tab {
+  padding: 8px 20px;
+  font-size: 11px;
+  color: var(--text-dim);
+  border-right: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--editor-bg);
+  text-transform: lowercase;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.editor-tab.active {
+  background: var(--editor-bg);
+  color: var(--accent);
+  border-bottom: 1px solid var(--accent);
+}
+.editor-content {
+  padding: 24px;
+  font-size: 14px;
+  line-height: 1.6;
+  min-height: 350px;
+  overflow-x: auto;
+}
+.code-keyword {
+  color: #c678dd;
+}
+.code-string {
+  color: #98c379;
+}
+.code-key {
+  color: #e06c75;
+}
+.code-comment {
+  color: #5c6370;
+  font-style: italic;
+}

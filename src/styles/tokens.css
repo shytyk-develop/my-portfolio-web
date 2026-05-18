@@ -1,0 +1,29 @@
+:root {
+  --bg: #050505;
+  --accent: #4af626;
+  --accent-glow: rgba(74, 246, 38, 0.6);
+  --text-main: #e0e0e0;
+  --text-dim: #666666;
+  --border: #1b1b1b;
+  --editor-bg: #0a0a0a;
+  --header-bg: rgba(0, 0, 0, 0.8);
+  --card-bg: rgba(5, 5, 5, 0.8);
+  --term-header: #111;
+  --highlight: #38bdf8;
+  --danger: #ef4444;
+  --cinematic-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --cinematic-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+[data-theme='light'] {
+  --bg: #f8fafc;
+  --accent: #1e3a8a;
+  --accent-glow: rgba(30, 58, 138, 0.6);
+  --text-main: #0f172a;
+  --text-dim: #64748b;
+  --border: #efefef;
+  --editor-bg: #ffffff;
+  --header-bg: rgba(248, 250, 252, 0.9);
+  --card-bg: rgba(255, 255, 255, 0.7);
+  --term-header: #f1f5f9;
+}
