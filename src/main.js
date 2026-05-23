@@ -13,6 +13,8 @@ import { initReveal } from './js/modules/reveal.js';
 import { initWhoami } from './js/modules/whoami.js';
 import { initClock } from './js/modules/clock.js';
 import { initContact } from './js/modules/contact.js';
+import { initWorkflow } from './js/modules/workflow.js';
+import { initSignals } from './js/modules/signals.js';
 import { renderExperienceSection } from './js/render/experience.js';
 import { initCinematic } from './js/cinematic/engine.js';
 
@@ -26,6 +28,8 @@ function init() {
   initProjects();
   initStack();
   initBlueprint();
+  initWorkflow();
+  initSignals();
   initReveal();
   initWhoami();
   initClock();

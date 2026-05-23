@@ -1,13 +1,20 @@
 import { blueprintContent } from '../../data/blueprint.js';
 
 export function initBlueprint() {
-  document.querySelectorAll('.editor-tab').forEach((tab) => {
+  const code = document.getElementById('code-content');
+  const tabs = document.querySelectorAll('.editor-tab');
+
+  tabs.forEach((tab) => {
     tab.addEventListener('click', () => {
-      document.querySelectorAll('.editor-tab').forEach((t) => t.classList.remove('active'));
+      tabs.forEach((t) => t.classList.remove('active'));
       tab.classList.add('active');
       const file = tab.getAttribute('data-file');
-      const code = document.getElementById('code-content');
-      if (code && file) code.innerHTML = blueprintContent[file];
+      if (code && file) {
+        code.classList.remove('editor-content--fade');
+        void code.offsetWidth;
+        code.innerHTML = blueprintContent[file];
+        code.classList.add('editor-content--fade');
+      }
     });
   });
 }

@@ -26,10 +26,62 @@
   position: relative;
   text-align: center;
   line-height: 1;
-  white-space: nowrap;
   max-width: 100%;
+  padding: 0 0.5rem;
   --x: -50%;
   --y: 50%;
+}
+
+@media (max-width: 767px) {
+  .reveal-text {
+    white-space: normal;
+    font-size: clamp(1.25rem, 9vw, 2.5rem);
+    line-height: 1.05;
+  }
+}
+
+@media (min-width: 768px) {
+  .reveal-text {
+    white-space: nowrap;
+  }
+}
+
+.hero-scroll-hint {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 2rem;
+  font-size: 8px;
+  letter-spacing: 0.2em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+.hero-scroll-hint__line {
+  width: 1px;
+  height: 28px;
+  background: linear-gradient(var(--accent), transparent);
+  animation: hero-scroll-pulse 2s ease-in-out infinite;
+}
+
+@keyframes hero-scroll-pulse {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scaleY(0.7);
+  }
+  50% {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-scroll-hint__line {
+    animation: none;
+    opacity: 0.6;
+  }
 }
 
 .reveal-text::after {

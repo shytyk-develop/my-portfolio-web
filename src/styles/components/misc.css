@@ -84,9 +84,134 @@
   color: var(--accent);
 }
 
+.stack-bars {
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.stack-bar-row {
+  display: grid;
+  grid-template-columns: 5.5rem 1fr;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.stack-bar-row__label {
+  font-size: 9px;
+  color: var(--text-dim);
+}
+
+.stack-bar {
+  height: 4px;
+  background: var(--border);
+  position: relative;
+  overflow: hidden;
+}
+
+.stack-bar span {
+  display: block;
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  transition: width 0.8s var(--cinematic-ease);
+}
+
+.contact-form-panel {
+  border: 1px solid var(--border);
+  background: var(--card-bg);
+  padding: 1rem;
+}
+
+@media (min-width: 768px) {
+  .contact-form-panel {
+    padding: 1.25rem 1.5rem;
+  }
+}
+
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.contact-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 9px;
+  color: var(--text-dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.contact-form input,
+.contact-form textarea {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 11px;
+  padding: 0.6rem 0.75rem;
+  outline: none;
+  transition: border-color 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus {
+  border-color: var(--accent);
+}
+
+.contact-form textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+#contact-submit {
+  background: transparent;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 0.65rem 1rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: background 0.2s, color 0.2s;
+  min-height: 44px;
+}
+
+#contact-submit:hover:not(:disabled) {
+  background: var(--accent);
+  color: #000;
+}
+
+#contact-submit:disabled {
+  opacity: 0.5;
+}
+
+.contact-form-status {
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  min-height: 14px;
+}
+
+.contact-form-status--ok {
+  color: var(--accent);
+}
+
+.contact-form-status--err {
+  color: var(--danger);
+}
+
 #toast-container {
   position: fixed;
-  bottom: 40px;
+  bottom: calc(48px + env(safe-area-inset-bottom, 0px));
   left: 50%;
   transform: translateX(-50%) translateY(20px);
   z-index: 100;

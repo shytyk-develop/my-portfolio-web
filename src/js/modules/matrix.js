@@ -1,14 +1,22 @@
 export function initMatrix() {
   const canvas = document.getElementById('bg-canvas');
   if (!canvas) return;
-  const ctx = canvas.getContext('2d');
 
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isMobile = window.matchMedia('(max-width: 767px)').matches;
+  if (reducedMotion) {
+    canvas.style.display = 'none';
+    return;
+  }
+
+  const ctx = canvas.getContext('2d');
   let width = (canvas.width = window.innerWidth);
   let height = (canvas.height = window.innerHeight);
   let columns = Math.floor(width / 20);
   const characters = '01ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   const charArray = characters.split('');
   let drops = Array.from({ length: columns }, () => Math.random() * -100);
+  let intervalId = null;
 
   function draw() {
     const isLight = document.documentElement.getAttribute('data-theme') === 'light';
@@ -25,12 +33,22 @@ export function initMatrix() {
     }
   }
 
-  setInterval(draw, 50);
+  const fps = isMobile ? 30 : 50;
+  intervalId = setInterval(draw, fps);
 
   window.addEventListener('resize', () => {
     width = canvas.width = window.innerWidth;
     height = canvas.height = window.innerHeight;
     columns = Math.floor(width / 20);
     drops = Array.from({ length: columns }, () => Math.random() * -100);
+  });
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden && intervalId) {
+      clearInterval(intervalId);
+      intervalId = null;
+    } else if (!document.hidden && !intervalId) {
+      intervalId = setInterval(draw, fps);
+    }
   });
 }

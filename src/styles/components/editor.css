@@ -34,12 +34,34 @@
   color: var(--accent);
   border-bottom: 1px solid var(--accent);
 }
+.editor-content--fade {
+  animation: editor-fade 0.35s var(--cinematic-ease);
+}
+
+@keyframes editor-fade {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .editor-content {
   padding: 24px;
   font-size: 14px;
   line-height: 1.6;
   min-height: 350px;
   overflow-x: auto;
+}
+
+@media (max-width: 767px) {
+  .editor-content {
+    min-height: 220px;
+    padding: 1rem;
+  }
 }
 .code-keyword {
   color: #c678dd;

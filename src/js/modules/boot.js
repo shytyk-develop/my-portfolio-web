@@ -1,18 +1,17 @@
 import { refreshIcons } from '../utils/icons.js';
-import { saveSessionKey } from '../utils/session-key.js';
+import { initSessionFromApi } from '../utils/session-key.js';
 
 const bootSequence = [
   { type: 'text', content: '<span class="boot-dim">──────────────────────────────────────────</span>' },
   { type: 'text', content: '<span class="boot-ok">[ OK ]</span> <span class="boot-white">Loading ARCHITECT_OS core...</span>' },
   { type: 'text', content: '<span class="boot-ok">[ OK ]</span> <span class="boot-white">Mounting encrypted file system...</span>' },
-  { type: 'text', content: '<span class="boot-ok">[ OK ]</span> <span class="boot-white">Loading environment modules...</span>' },
-  { type: 'text', content: '<span class="boot-ok">[ OK ]</span> <span class="boot-white">Establishing secure tunnel...</span>' },
+  { type: 'text', content: '<span class="boot-ok">[ OK ]</span> <span class="boot-white">Connecting to session API...</span>' },
   { type: 'text', content: '<span class="boot-ok">[ OK ]</span> <span class="boot-white">Authentication system initialized.</span>' },
   { type: 'text', content: '<span class="boot-dim">──────────────────────────────────────────</span>' },
   { type: 'text', content: '' },
   { type: 'text', content: '<span class="boot-warn">[ AUTH ]</span> <span class="boot-white">Authorization is required to access the system.</span>' },
-  { type: 'text', content: '<span class="boot-white">  A <span class="boot-cmd">SECURITY_KEY</span> will be generated and stored in this session.</span>' },
-  { type: 'text', content: '<span class="boot-white">  You can recover it anytime via terminal: <span class="boot-cmd">key</span></span>' },
+  { type: 'text', content: '<span class="boot-white">  A <span class="boot-cmd">SECURITY_KEY</span> will be issued by the server for this session.</span>' },
+  { type: 'text', content: '<span class="boot-white">  Recover anytime: terminal <span class="boot-cmd">key</span> or projects gate.</span>' },
   { type: 'text', content: '' },
   { type: 'text', content: '<span class="boot-white">Continue and create key?  [<span class="boot-cmd">y</span> / <span class="boot-cmd-2">n</span>]</span>' },
   { type: 'input' },
@@ -24,6 +23,7 @@ export function initBoot() {
   const bootBody = document.getElementById('boot-terminal-body');
   const bootWelcome = document.getElementById('boot-welcome-overlay');
   const bootSession = document.getElementById('boot-session');
+  const bootSkip = document.getElementById('boot-skip');
 
   if (!bootBody || !bootScreen) return;
 
@@ -34,6 +34,8 @@ export function initBoot() {
       .toString(16)
       .toUpperCase()}`;
   }
+
+  bootSkip?.addEventListener('click', () => finalizeBoot());
 
   async function runBootSequence() {
     if (bootSeqIdx >= bootSequence.length) return;
@@ -81,9 +83,9 @@ export function initBoot() {
 
   async function startKeyGeneration() {
     const steps = [
-      'Gathering entropy from the hardware pool...',
+      'Requesting session from API...',
       'Generating 128-bit session vector...',
-      'Calculating key checksum...',
+      'Signing JWT session token...',
       'Finalizing SECURITY_KEY...',
     ];
     for (const s of steps) {
@@ -94,11 +96,7 @@ export function initBoot() {
       await new Promise((r) => setTimeout(r, 380));
     }
 
-    const key = Array.from({ length: 16 }, () =>
-      'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'[Math.floor(Math.random() * 36)]
-    ).join('');
-
-    saveSessionKey(key);
+    const key = await initSessionFromApi();
 
     const sep = document.createElement('div');
     sep.innerHTML = '<span class="boot-dim">──────────────────────────────────────────</span>';
@@ -119,7 +117,7 @@ export function initBoot() {
     const hint = document.createElement('div');
     hint.className = 'boot-key-hint';
     hint.innerHTML =
-      '<span class="boot-warn">ℹ</span> <span>Key is saved in this browser session. Lost clipboard? Use terminal command <span class="boot-cmd">key</span> or recover at projects gate.</span>';
+      '<span class="boot-warn">ℹ</span> <span>Key stored in session + signed server-side. Terminal: <span class="boot-cmd">key</span></span>';
     bootBody.appendChild(hint);
 
     document.getElementById('copy-boot-key')?.addEventListener('click', async () => {

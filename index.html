@@ -38,6 +38,7 @@
       <div id="boot-welcome-overlay">
         <h2 id="boot-welcome-text">WELCOME</h2>
       </div>
+      <button type="button" id="boot-skip" class="boot-skip-btn">SKIP_BOOT</button>
     </div>
 
     <!-- DRAWER -->
@@ -74,7 +75,17 @@
       <span class="font-bold tracking-tighter text-[var(--accent)] text-sm md:text-base">SHYTYK_DEV</span>
       <span class="text-[var(--text-dim)] text-[8px] md:text-[10px] border border-strict px-1 md:px-2 py-0.5 hidden sm:inline-block">V2.0_CINEMATIC</span>
     </div>
-    <div class="flex items-center gap-4 md:gap-8 text-[10px] tracking-widest text-[var(--text-dim)]">
+    <nav class="site-nav" aria-label="Sections">
+      <a href="#stack" class="site-nav__link">Stack</a>
+      <a href="#experience" class="site-nav__link">Work</a>
+      <a href="#projects" class="site-nav__link">Projects</a>
+      <a href="#contact" class="site-nav__link">Contact</a>
+    </nav>
+    <div class="flex items-center gap-3 md:gap-6 text-[10px] tracking-widest text-[var(--text-dim)]">
+      <div class="api-status hidden sm:flex" title="Backend health">
+        <span id="api-status-dot" class="api-status-dot"></span>
+        <span id="api-status-label">API …</span>
+      </div>
       <button id="theme-toggle" type="button" onclick="toggleTheme()" title="Switch Theme" aria-label="Toggle theme">
         <i data-lucide="moon" id="theme-icon" class="w-4 h-4"></i>
       </button>
@@ -103,9 +114,18 @@
           </p>
           <p class="text-[var(--text-main)] text-[10px] md:text-xs italic">&gt;_ Robust code for seamless experience</p>
         </div>
-        <button type="button" onclick="openTerminalWithWelcome()" class="text-[var(--accent)] text-[9px] md:text-[10px] border border-accent px-6 md:px-8 py-3 hover:bg-[var(--accent)] hover:text-black transition-all uppercase font-bold tracking-widest w-full sm:w-auto font-inherit bg-transparent" data-cinematic="hero-cta">
-          Execute
-        </button>
+        <div class="flex flex-col sm:flex-row gap-3 sm:items-center">
+          <button type="button" onclick="openTerminalWithWelcome()" class="text-[var(--accent)] text-[9px] md:text-[10px] border border-accent px-6 md:px-8 py-3 hover:bg-[var(--accent)] hover:text-black transition-all uppercase font-bold tracking-widest w-full sm:w-auto font-inherit bg-transparent min-h-[44px]" data-cinematic="hero-cta">
+            Execute
+          </button>
+          <a href="#stack" class="text-[var(--text-dim)] text-[9px] md:text-[10px] border border-strict px-6 py-3 hover:border-accent hover:text-[var(--accent)] transition-all uppercase font-bold tracking-widest text-center w-full sm:w-auto min-h-[44px] flex items-center justify-center">
+            View_Stack
+          </a>
+        </div>
+        <div class="hero-scroll-hint lg:hidden" data-cinematic="fade" aria-hidden="true">
+          <span>Scroll</span>
+          <div class="hero-scroll-hint__line"></div>
+        </div>
       </div>
       <div class="border border-strict bg-[var(--card-bg)] backdrop-blur-md p-4 md:p-6 font-mono text-[10px] md:text-xs tracking-wide relative overflow-hidden group" data-cinematic="hero-card">
         <div class="absolute inset-0 opacity-[0.03] pointer-events-none bg-[linear-gradient(transparent,rgba(255,255,255,0.05))]"></div>
@@ -253,34 +273,84 @@
       </div>
     </section>
 
-    <!-- 05 CONTACT -->
-    <section id="contact" class="max-w-6xl mx-auto px-4 md:px-6 mb-12">
+    <!-- 05 WORKFLOW -->
+    <section id="workflow" class="max-w-6xl mx-auto px-4 md:px-6 mb-16 md:mb-24">
       <div class="section-heading" data-cinematic="heading">
         <span class="section-heading__num">05</span>
+        <h2 class="section-heading__title">DEV_WORKFLOW // PIPELINE</h2>
+        <div class="section-heading__line"></div>
+      </div>
+      <p class="text-[var(--text-dim)] text-[10px] md:text-xs uppercase tracking-widest mb-6 max-w-xl" data-cinematic="fade">
+        How I move from idea to production — select a phase
+      </p>
+      <div class="workflow-layout">
+        <div id="workflow-track"></div>
+        <div id="workflow-detail" class="workflow-detail"></div>
+      </div>
+    </section>
+
+    <!-- 06 SERVER SIGNALS -->
+    <section id="signals" class="max-w-6xl mx-auto px-4 md:px-6 mb-16 md:mb-24">
+      <div class="section-heading" data-cinematic="heading">
+        <span class="section-heading__num">06</span>
+        <h2 class="section-heading__title">SYSTEM_SIGNALS // LIVE_METRICS</h2>
+        <div class="section-heading__line"></div>
+      </div>
+      <p class="text-[var(--text-dim)] text-[10px] md:text-xs uppercase tracking-widest mb-6 max-w-xl" data-cinematic="fade">
+        Portfolio stats served by FastAPI — not hardcoded on the client
+      </p>
+      <div id="signals-grid"></div>
+    </section>
+
+    <!-- 07 CONTACT -->
+    <section id="contact" class="max-w-6xl mx-auto px-4 md:px-6 mb-12">
+      <div class="section-heading" data-cinematic="heading">
+        <span class="section-heading__num">07</span>
         <h2 class="section-heading__title">ESTABLISH_CONNECTION</h2>
         <div class="section-heading__line"></div>
       </div>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <div class="contact-form-panel" data-cinematic="card">
+          <div class="text-[9px] text-[var(--text-dim)] uppercase tracking-widest mb-4">Secure_Transmit // POST /api/contact</div>
+          <form id="contact-form" class="contact-form" novalidate>
+            <label>
+              Name
+              <input type="text" name="name" required minlength="2" maxlength="80" autocomplete="name">
+            </label>
+            <label>
+              Email
+              <input type="email" name="email" required autocomplete="email">
+            </label>
+            <label>
+              Message
+              <textarea name="message" required minlength="10" maxlength="2000" placeholder="Describe your project or question…"></textarea>
+            </label>
+            <button type="submit" id="contact-submit">SEND_MESSAGE</button>
+            <p id="contact-form-status" class="contact-form-status" role="status"></p>
+          </form>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4">
         <div class="contact-card border-strict p-4 md:p-6 bg-[var(--card-bg)] backdrop-blur-sm flex flex-col justify-between" data-cinematic="card">
           <div>
             <h3 class="text-xs md:text-sm font-bold uppercase mb-1">Direct_Mail</h3>
             <p class="text-[9px] md:text-[10px] text-[var(--text-dim)] mb-4">shytyk.develop@architect.dev</p>
           </div>
-          <button type="button" onclick="copyEmail('shytyk.develop@architect.dev')" class="w-full py-2 border border-strict text-[9px] md:text-[10px] uppercase font-bold hover:bg-[var(--accent)] hover:text-black hover:border-accent transition-all font-inherit bg-transparent">Copy_Address</button>
+          <button type="button" onclick="copyEmail('shytyk.develop@architect.dev')" class="w-full py-2 border border-strict text-[9px] md:text-[10px] uppercase font-bold hover:bg-[var(--accent)] hover:text-black hover:border-accent transition-all font-inherit bg-transparent min-h-[44px]">Copy_Address</button>
         </div>
         <div class="contact-card border-strict p-4 md:p-6 bg-[var(--card-bg)] backdrop-blur-sm flex flex-col justify-between" data-cinematic="card">
           <div>
             <h3 class="text-xs md:text-sm font-bold uppercase mb-1">Source_Code</h3>
             <p class="text-[9px] md:text-[10px] text-[var(--text-dim)] mb-4">GitHub repositories</p>
           </div>
-          <a href="https://github.com/shytyk-develop" target="_blank" rel="noopener" class="w-full py-2 border border-strict text-[9px] md:text-[10px] uppercase font-bold hover:bg-[var(--accent)] hover:text-black hover:border-accent transition-all flex items-center justify-center">Browse_Repo</a>
+          <a href="https://github.com/shytyk-develop" target="_blank" rel="noopener" class="w-full py-2 border border-strict text-[9px] md:text-[10px] uppercase font-bold hover:bg-[var(--accent)] hover:text-black hover:border-accent transition-all flex items-center justify-center min-h-[44px]">Browse_Repo</a>
         </div>
         <div class="contact-card border-strict p-4 md:p-6 bg-[var(--card-bg)] backdrop-blur-sm flex flex-col justify-between" data-cinematic="card">
           <div>
             <h3 class="text-xs md:text-sm font-bold uppercase mb-1">Social_Profile</h3>
             <p class="text-[9px] md:text-[10px] text-[var(--text-dim)] mb-4">LinkedIn</p>
           </div>
-          <a href="https://linkedin.com/in/jan-shytyk" target="_blank" rel="noopener" class="w-full py-2 border border-strict text-[9px] md:text-[10px] uppercase font-bold hover:bg-[var(--accent)] hover:text-black hover:border-accent transition-all flex items-center justify-center">View_Profile</a>
+          <a href="https://linkedin.com/in/jan-shytyk" target="_blank" rel="noopener" class="w-full py-2 border border-strict text-[9px] md:text-[10px] uppercase font-bold hover:bg-[var(--accent)] hover:text-black hover:border-accent transition-all flex items-center justify-center min-h-[44px]">View_Profile</a>
+        </div>
         </div>
       </div>
     </section>

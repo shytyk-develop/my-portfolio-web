@@ -4,7 +4,7 @@ body {
   font-family: 'JetBrains Mono', monospace;
   margin: 0;
   overflow-x: hidden;
-  cursor: crosshair;
+  cursor: default;
   transition: background-color 0.4s ease, color 0.4s ease;
 }
 
@@ -19,7 +19,9 @@ body {
   .editor-tab,
   .stack-item,
   .contact-card,
-  .exp-chapter-nav__btn {
+  .workflow-step,
+  .experience-chapter-nav__btn,
+  .site-nav__link {
     cursor: none !important;
   }
 }
@@ -214,7 +216,70 @@ body {
   }
 
   input#cli,
-  input#gate-key-input {
+  input#gate-key-input,
+  .contact-form input,
+  .contact-form textarea {
     font-size: 16px; /* prevents iOS zoom on focus */
   }
+
+  #toast-container {
+    bottom: calc(52px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .site-nav {
+    display: none;
+  }
+
+  #projects-lock-wrapper {
+    min-height: 420px;
+  }
+}
+
+@media (min-width: 768px) {
+  .site-nav {
+    display: flex;
+    gap: 1rem;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+}
+
+.site-nav__link {
+  color: var(--text-dim);
+  text-decoration: none;
+  padding: 0.25rem 0;
+  border-bottom: 1px solid transparent;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.site-nav__link:hover,
+.site-nav__link.is-active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.api-status {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  color: var(--text-dim);
+}
+
+.api-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-dim);
+}
+
+.api-status-dot--online {
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent-glow);
+}
+
+.api-status-dot--offline {
+  background: var(--danger);
 }

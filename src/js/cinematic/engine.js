@@ -6,21 +6,33 @@ gsap.registerPlugin(ScrollTrigger);
 
 let bootDone = false;
 
+function prefersReducedMotion() {
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
 export function initCinematic() {
   const run = () => {
     if (bootDone) return;
     bootDone = true;
+
+    if (prefersReducedMotion()) {
+      gsap.set('[data-cinematic]', { clearProps: 'all', opacity: 1, y: 0, filter: 'none' });
+      initExperienceCinema();
+      ScrollTrigger.refresh();
+      return;
+    }
+
     initGlobalScroll();
     initHeroCinematic();
     initSectionReveals();
     initExperienceCinema();
     initRevealDivider();
+    initNavHighlight();
     ScrollTrigger.refresh();
   };
 
   window.addEventListener('boot-complete', run, { once: true });
 
-  // Fallback if boot was skipped (dev hot reload)
   setTimeout(() => {
     if (!bootDone && !document.getElementById('boot-screen')?.offsetParent) run();
   }, 3000);
@@ -30,9 +42,8 @@ function initGlobalScroll() {
   gsap.utils.toArray('[data-cinematic="fade"]').forEach((el) => {
     gsap.from(el, {
       opacity: 0,
-      y: 40,
-      filter: 'blur(8px)',
-      duration: 1.2,
+      y: 28,
+      duration: 0.9,
       ease: 'power3.out',
       scrollTrigger: {
         trigger: el,
@@ -55,24 +66,21 @@ function initGlobalScroll() {
       },
     });
 
-    if (num) tl.from(num, { x: -60, opacity: 0, duration: 0.8, ease: 'power4.out' }, 0);
-    if (title) tl.from(title, { x: -40, opacity: 0, duration: 0.9, ease: 'power4.out' }, 0.1);
-    if (line) tl.from(line, { scaleX: 0, transformOrigin: 'left', duration: 1, ease: 'power3.inOut' }, 0.25);
+    if (num) tl.from(num, { x: -40, opacity: 0, duration: 0.7, ease: 'power4.out' }, 0);
+    if (title) tl.from(title, { x: -28, opacity: 0, duration: 0.8, ease: 'power4.out' }, 0.08);
+    if (line) tl.from(line, { scaleX: 0, transformOrigin: 'left', duration: 0.9, ease: 'power3.inOut' }, 0.2);
   });
 
   gsap.utils.toArray('[data-cinematic="card"]').forEach((el, i) => {
     gsap.from(el, {
       opacity: 0,
-      y: 50,
-      scale: 0.96,
-      rotateX: 8,
-      transformPerspective: 800,
-      duration: 1,
-      delay: (i % 4) * 0.08,
+      y: 36,
+      duration: 0.85,
+      delay: (i % 3) * 0.06,
       ease: 'power3.out',
       scrollTrigger: {
         trigger: el,
-        start: 'top 90%',
+        start: 'top 92%',
         toggleActions: 'play none none reverse',
       },
     });
@@ -85,28 +93,21 @@ function initHeroCinematic() {
 
   const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
 
-  tl.from('#home [data-cinematic="hero-tag"]', { opacity: 0, y: 20, duration: 0.6 }, 0.2)
-    .from(
-      '#home .hero-title-line',
-      { y: '110%', duration: 1.1, stagger: 0.12, ease: 'power4.out' },
-      0.35
-    )
-    .from('#home [data-cinematic="hero-bio"]', { opacity: 0, x: -30, filter: 'blur(6px)', duration: 0.9 }, 0.7)
-    .from('#home [data-cinematic="hero-cta"]', { opacity: 0, y: 24, duration: 0.7 }, 0.95)
-    .from(
-      '#home [data-cinematic="hero-card"]',
-      { opacity: 0, scale: 0.92, rotateY: -12, transformPerspective: 1000, duration: 1.1 },
-      0.5
-    );
+  tl.from('#home [data-cinematic="hero-tag"]', { opacity: 0, y: 16, duration: 0.55 }, 0.15)
+    .from('#home .hero-title-line', { y: '105%', duration: 1, stagger: 0.1, ease: 'power4.out' }, 0.3)
+    .from('#home [data-cinematic="hero-bio"]', { opacity: 0, x: -24, duration: 0.8 }, 0.55)
+    .from('#home [data-cinematic="hero-cta"]', { opacity: 0, y: 18, duration: 0.65 }, 0.75)
+    .from('#home [data-cinematic="hero-card"]', { opacity: 0, scale: 0.96, duration: 0.95 }, 0.45)
+    .from('#home .hero-scroll-hint', { opacity: 0, y: 8, duration: 0.5 }, 1.1);
 
   gsap.to('#home [data-cinematic="hero-card"]', {
-    y: -12,
+    y: -8,
     ease: 'none',
     scrollTrigger: {
       trigger: hero,
       start: 'top top',
       end: 'bottom top',
-      scrub: 1.2,
+      scrub: 1,
     },
   });
 }
@@ -116,15 +117,15 @@ function initSectionReveals() {
     if (section.id === 'experience' || section.id === 'reveal-section') return;
 
     gsap.from(section, {
-      opacity: 0.6,
-      y: 30,
-      duration: 1,
+      opacity: 0.85,
+      y: 20,
+      duration: 0.8,
       ease: 'power2.out',
       scrollTrigger: {
         trigger: section,
-        start: 'top 92%',
-        end: 'top 60%',
-        scrub: 0.6,
+        start: 'top 94%',
+        end: 'top 70%',
+        scrub: 0.4,
       },
     });
   });
@@ -136,16 +137,38 @@ function initRevealDivider() {
   if (!section || !text) return;
 
   gsap.from(text, {
-    scale: 0.85,
-    opacity: 0.3,
-    letterSpacing: '0.2em',
-    duration: 1.5,
+    scale: 0.92,
+    opacity: 0.4,
+    duration: 1.2,
     ease: 'power3.out',
     scrollTrigger: {
       trigger: section,
-      start: 'top 80%',
-      end: 'top 40%',
-      scrub: 1,
+      start: 'top 82%',
+      end: 'top 45%',
+      scrub: 0.8,
     },
+  });
+}
+
+function initNavHighlight() {
+  const links = gsap.utils.toArray('.site-nav__link');
+  if (!links.length) return;
+
+  links.forEach((link) => {
+    const id = link.getAttribute('href')?.slice(1);
+    const section = id ? document.getElementById(id) : null;
+    if (!section) return;
+
+    ScrollTrigger.create({
+      trigger: section,
+      start: 'top 55%',
+      end: 'bottom 45%',
+      onToggle: (self) => {
+        if (self.isActive) {
+          links.forEach((l) => l.classList.remove('is-active'));
+          link.classList.add('is-active');
+        }
+      },
+    });
   });
 }

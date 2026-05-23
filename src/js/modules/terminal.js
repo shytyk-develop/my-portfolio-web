@@ -1,7 +1,22 @@
 import { refreshIcons } from '../utils/icons.js';
-import { getSessionKey, copySessionKey, hasSessionKey, maskSessionKey } from '../utils/session-key.js';
+import { apiHealth, apiMetrics, apiStatus } from '../api/client.js';
+import {
+  getSessionKey,
+  copySessionKey,
+  maskSessionKey,
+  recoverSessionKeyFromApi,
+} from '../utils/session-key.js';
 
-const availableSections = ['home', 'stack', 'experience', 'projects', 'blueprint', 'contact'];
+const availableSections = [
+  'home',
+  'stack',
+  'experience',
+  'projects',
+  'blueprint',
+  'workflow',
+  'signals',
+  'contact',
+];
 
 export function initTerminal() {
   const terminalWindow = document.getElementById('terminal-window');
@@ -66,10 +81,12 @@ export function initTerminal() {
         '  date      - Current system time',
         '  clear     - Clear the console',
         '  key       - Show / copy session SECURITY_KEY',
+        '  ping      - API health + status',
+        '  metrics   - Server portfolio metrics',
         '  help      - Show this help',
       ]),
-    key: () => {
-      const key = getSessionKey();
+    key: async () => {
+      const key = await recoverSessionKeyFromApi();
       if (!key) {
         printToTerminal(['ERROR: No session key. Complete boot sequence first.'], true);
         return;
@@ -81,6 +98,34 @@ export function initTerminal() {
         '  ACTION: Copying to clipboard...',
       ]);
       copySessionKey();
+    },
+    ping: async () => {
+      try {
+        const health = await apiHealth();
+        const status = await apiStatus();
+        printToTerminal([
+          'API_PING:',
+          `  health: ${health.status} v${health.version}`,
+          `  region: ${status.region}`,
+          `  message: ${status.message}`,
+        ]);
+      } catch (err) {
+        printToTerminal([`API_OFFLINE: ${err.message}`], true);
+      }
+    },
+    metrics: async () => {
+      try {
+        const m = await apiMetrics();
+        printToTerminal([
+          'SERVER_METRICS:',
+          `  api_version: ${m.api_version}`,
+          `  projects_indexed: ${m.projects_indexed}`,
+          `  stack_modules: ${m.stack_modules}`,
+          `  experience_chapters: ${m.experience_chapters}`,
+        ]);
+      } catch (err) {
+        printToTerminal([`METRICS_UNAVAILABLE: ${err.message}`], true);
+      }
     },
     ls: () => printToTerminal(['System sections:', ...availableSections.map((s) => `  /bin/${s}`)]),
     whoami: () =>

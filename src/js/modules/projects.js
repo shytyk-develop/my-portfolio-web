@@ -7,6 +7,8 @@ import {
   copySessionKey,
   setProjectsUnlocked,
   applyProjectsUnlockIfSaved,
+  verifyKeyOnServer,
+  recoverSessionKeyFromApi,
 } from '../utils/session-key.js';
 
 export function initProjects() {
@@ -74,7 +76,7 @@ function initProjectGate() {
   const recoveredValue = document.getElementById('gate-recovered-value');
   const copyBtn = document.getElementById('gate-copy-key');
 
-  window.verifyProjectsKey = () => {
+  window.verifyProjectsKey = async () => {
     const input = document.getElementById('gate-key-input');
     const errorMsg = document.getElementById('gate-error-msg');
     const storedKey = getSessionKey();
@@ -87,7 +89,8 @@ function initProjectGate() {
       return;
     }
 
-    if (entered === storedKey) {
+    const valid = await verifyKeyOnServer(entered, storedKey);
+    if (valid) {
       if (errorMsg) errorMsg.textContent = '';
       setProjectsUnlocked();
       document.getElementById('projects-lock-wrapper')?.classList.add('unlocked');
@@ -103,8 +106,8 @@ function initProjectGate() {
     }
   };
 
-  window.showSessionKeyAtGate = () => {
-    const key = getSessionKey();
+  window.showSessionKeyAtGate = async () => {
+    const key = await recoverSessionKeyFromApi();
     const errorMsg = document.getElementById('gate-error-msg');
 
     if (!key) {

@@ -209,3 +209,33 @@
   margin-right: 8px;
   user-select: none;
 }
+
+.boot-skip-btn {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  background: transparent;
+  border: 1px solid #333;
+  color: #666;
+  font-family: inherit;
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+  min-height: 44px;
+  z-index: 10001;
+}
+
+.boot-skip-btn:hover {
+  border-color: #4af626;
+  color: #4af626;
+}
+
+@media (min-width: 640px) {
+  .boot-skip-btn {
+    bottom: 1.5rem;
+    right: 1.5rem;
+  }
+}
