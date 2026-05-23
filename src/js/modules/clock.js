@@ -6,10 +6,7 @@ export function initClock() {
   const apiLabel = document.getElementById('api-status-label');
 
   setInterval(() => {
-    const now = new Date();
-    const clock = document.getElementById('clock');
     const uptime = document.getElementById('uptime-display');
-    if (clock) clock.innerText = now.toTimeString().split(' ')[0];
     const diff = Math.floor((Date.now() - startTime) / 1000);
     const h = String(Math.floor(diff / 3600)).padStart(2, '0');
     const m = String(Math.floor((diff % 3600) / 60)).padStart(2, '0');
@@ -38,7 +35,7 @@ export function initClock() {
       }
       if (apiLabel) {
         apiLabel.textContent = 'API OFF';
-        apiLabel.title = 'Start: npm run dev:full';
+        apiLabel.title = 'Backend unavailable';
       }
     }
   }

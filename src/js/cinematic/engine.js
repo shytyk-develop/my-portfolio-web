@@ -96,9 +96,11 @@ function initHeroCinematic() {
   tl.from('#home [data-cinematic="hero-tag"]', { opacity: 0, y: 16, duration: 0.55 }, 0.15)
     .from('#home .hero-title-line', { y: '105%', duration: 1, stagger: 0.1, ease: 'power4.out' }, 0.3)
     .from('#home [data-cinematic="hero-bio"]', { opacity: 0, x: -24, duration: 0.8 }, 0.55)
-    .from('#home [data-cinematic="hero-cta"]', { opacity: 0, y: 18, duration: 0.65 }, 0.75)
+    .from('#home [data-cinematic="hero-actions"]', { opacity: 0, y: 12, duration: 0.55, clearProps: 'opacity,transform' }, 0.75)
     .from('#home [data-cinematic="hero-card"]', { opacity: 0, scale: 0.96, duration: 0.95 }, 0.45)
-    .from('#home .hero-scroll-hint', { opacity: 0, y: 8, duration: 0.5 }, 1.1);
+    .from('#home .hero-scroll-hint', { opacity: 0, y: 8, duration: 0.5 }, 1.05);
+
+  gsap.set('#home .hero-actions, #home .hero-btn', { opacity: 1, visibility: 'visible' });
 
   gsap.to('#home [data-cinematic="hero-card"]', {
     y: -8,

@@ -93,7 +93,6 @@
         <span class="w-2 h-2 bg-[var(--accent)] animate-pulse"></span>
         <span id="uptime-display">UPTIME: 00:00:00</span>
       </div>
-      <div id="clock" class="text-[9px] md:text-[10px]">00:00:00</div>
     </div>
   </header>
 
@@ -114,15 +113,15 @@
           </p>
           <p class="text-[var(--text-main)] text-[10px] md:text-xs italic">&gt;_ Robust code for seamless experience</p>
         </div>
-        <div class="flex flex-col sm:flex-row gap-3 sm:items-center">
-          <button type="button" onclick="openTerminalWithWelcome()" class="text-[var(--accent)] text-[9px] md:text-[10px] border border-accent px-6 md:px-8 py-3 hover:bg-[var(--accent)] hover:text-black transition-all uppercase font-bold tracking-widest w-full sm:w-auto font-inherit bg-transparent min-h-[44px]" data-cinematic="hero-cta">
+        <div class="hero-actions" data-cinematic="hero-actions">
+          <button type="button" onclick="openTerminalWithWelcome()" class="hero-btn hero-btn--primary">
             Execute
           </button>
-          <a href="#stack" class="text-[var(--text-dim)] text-[9px] md:text-[10px] border border-strict px-6 py-3 hover:border-accent hover:text-[var(--accent)] transition-all uppercase font-bold tracking-widest text-center w-full sm:w-auto min-h-[44px] flex items-center justify-center">
+          <a href="#stack" class="hero-btn hero-btn--secondary">
             View_Stack
           </a>
         </div>
-        <div class="hero-scroll-hint lg:hidden" data-cinematic="fade" aria-hidden="true">
+        <div class="hero-scroll-hint lg:hidden" aria-hidden="true">
           <span>Scroll</span>
           <div class="hero-scroll-hint__line"></div>
         </div>
@@ -267,8 +266,7 @@
           <div class="editor-tab cursor-pointer" data-file="growth">scalability.md</div>
         </div>
         <div class="editor-content p-4 md:p-6" id="editor-body">
-          <pre class="font-mono text-[10px] md:text-xs whitespace-pre-wrap" id="code-content"><span class="code-comment"># System Architecture & Design Philosophy</span>
-<span class="code-key">architecture_style</span>: <span class="code-string">"Modular Monolith / Event-Driven Microservices"</span></pre>
+          <pre class="font-mono text-[10px] md:text-xs whitespace-pre-wrap" id="code-content"></pre>
         </div>
       </div>
     </section>
@@ -309,27 +307,7 @@
         <h2 class="section-heading__title">ESTABLISH_CONNECTION</h2>
         <div class="section-heading__line"></div>
       </div>
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <div class="contact-form-panel" data-cinematic="card">
-          <div class="text-[9px] text-[var(--text-dim)] uppercase tracking-widest mb-4">Secure_Transmit // POST /api/contact</div>
-          <form id="contact-form" class="contact-form" novalidate>
-            <label>
-              Name
-              <input type="text" name="name" required minlength="2" maxlength="80" autocomplete="name">
-            </label>
-            <label>
-              Email
-              <input type="email" name="email" required autocomplete="email">
-            </label>
-            <label>
-              Message
-              <textarea name="message" required minlength="10" maxlength="2000" placeholder="Describe your project or question…"></textarea>
-            </label>
-            <button type="submit" id="contact-submit">SEND_MESSAGE</button>
-            <p id="contact-form-status" class="contact-form-status" role="status"></p>
-          </form>
-        </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
         <div class="contact-card border-strict p-4 md:p-6 bg-[var(--card-bg)] backdrop-blur-sm flex flex-col justify-between" data-cinematic="card">
           <div>
             <h3 class="text-xs md:text-sm font-bold uppercase mb-1">Direct_Mail</h3>
@@ -350,7 +328,6 @@
             <p class="text-[9px] md:text-[10px] text-[var(--text-dim)] mb-4">LinkedIn</p>
           </div>
           <a href="https://linkedin.com/in/jan-shytyk" target="_blank" rel="noopener" class="w-full py-2 border border-strict text-[9px] md:text-[10px] uppercase font-bold hover:bg-[var(--accent)] hover:text-black hover:border-accent transition-all flex items-center justify-center min-h-[44px]">View_Profile</a>
-        </div>
         </div>
       </div>
     </section>

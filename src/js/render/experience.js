@@ -49,10 +49,11 @@ export function renderExperienceSection() {
           <h2 class="section-heading__title">WORK EXPERIENCE // CAREER_LOG</h2>
           <div class="section-heading__line"></div>
         </div>
-        <p class="text-[var(--text-dim)] text-[10px] md:text-xs uppercase tracking-widest max-w-xl" data-cinematic="fade">
-          Scroll to play through career chapters — cinematic timeline
+        <p class="text-[var(--text-dim)] text-[10px] md:text-xs uppercase tracking-widest max-w-xl experience-cinema__tagline" data-cinematic="fade">
+          <span class="experience-cinema__tagline-desktop">Scroll to play through career chapters — cinematic timeline</span>
+          <span class="experience-cinema__tagline-mobile">Career chapters — scroll or tap a chapter below</span>
         </p>
-        <div class="experience-cinema__scroll-hint" data-cinematic="fade">
+        <div class="experience-cinema__scroll-hint hidden lg:flex" data-cinematic="fade">
           <span>SCROLL TO PLAY</span>
           <div class="experience-cinema__scroll-hint-line"></div>
         </div>

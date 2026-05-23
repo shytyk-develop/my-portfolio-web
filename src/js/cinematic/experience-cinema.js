@@ -1,7 +1,11 @@
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-const MOBILE_MQ = '(max-width: 767px)';
+const MOBILE_MQ = '(max-width: 1023px)';
+
+function isMobileLayout() {
+  return window.matchMedia(MOBILE_MQ).matches;
+}
 
 export function initExperienceCinema() {
   const pinWrap = document.getElementById('experience-pin-wrap');
@@ -17,32 +21,33 @@ export function initExperienceCinema() {
   if (!pinWrap || !stage || slides.length === 0) return;
 
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const isMobile = window.matchMedia(MOBILE_MQ).matches;
+  const mobile = isMobileLayout();
   const slideCount = slides.length;
 
-  if (isMobile) {
-    pinWrap.classList.add('experience-pin-wrap--mobile');
-    stage.classList.add('experience-stage--mobile');
-  }
+  applyLayoutMode(pinWrap, stage, mobile);
 
   slides.forEach((slide, i) => {
     const inner = slide.querySelector('.experience-slide__inner');
-    if (i === 0) {
+    if (mobile || reducedMotion) {
+      gsap.set(slide, { clearProps: 'all' });
+      gsap.set(inner, { clearProps: 'all' });
+      slide.style.position = 'relative';
+      slide.style.visibility = 'visible';
+      slide.style.opacity = '1';
+      slide.classList.toggle('is-active', i === 0);
+      slide.setAttribute('aria-hidden', 'false');
+    } else if (i === 0) {
       gsap.set(slide, { visibility: 'visible', opacity: 1 });
       slide.classList.add('is-active');
-    } else if (!isMobile) {
+    } else {
       gsap.set(slide, { visibility: 'hidden', opacity: 0 });
       gsap.set(inner, { y: 60, opacity: 0 });
       slide.classList.remove('is-active');
-    } else {
-      gsap.set(slide, { visibility: 'visible', opacity: 1, clearProps: 'all' });
-      gsap.set(inner, { clearProps: 'all', opacity: 1, y: 0 });
-      slide.classList.toggle('is-active', i === 0);
     }
   });
 
-  if (reducedMotion || isMobile) {
-    initMobileOrReduced(slides, navBtns, isMobile && !reducedMotion);
+  if (reducedMotion || mobile) {
+    initMobileOrReduced(slides, navBtns, mobile && !reducedMotion);
     return;
   }
 
@@ -60,24 +65,36 @@ export function initExperienceCinema() {
   });
 }
 
+function applyLayoutMode(pinWrap, stage, mobile) {
+  pinWrap.classList.toggle('experience-pin-wrap--mobile', mobile);
+  stage.classList.toggle('experience-stage--mobile', mobile);
+
+  if (mobile) {
+    ScrollTrigger.getAll().forEach((st) => {
+      if (st.trigger === pinWrap || st.pin === stage) st.kill();
+    });
+    gsap.set(stage, { clearProps: 'all' });
+  }
+}
+
 function initMobileOrReduced(slides, navBtns, animate) {
   const progressFill = document.getElementById('exp-progress-fill');
 
-  slides.forEach((slide, i) => {
-    slide.style.position = 'relative';
-    slide.style.visibility = 'visible';
-    slide.style.opacity = '1';
-    slide.setAttribute('aria-hidden', 'false');
+  slides.forEach((slide) => {
+    const inner = slide.querySelector('.experience-slide__inner');
+    if (inner) {
+      gsap.set(inner, { clearProps: 'all', opacity: 1, y: 0 });
+    }
 
     if (animate) {
-      gsap.from(slide.querySelector('.experience-slide__inner'), {
+      gsap.from(inner, {
         opacity: 0,
-        y: 36,
-        duration: 0.8,
+        y: 28,
+        duration: 0.75,
         ease: 'power3.out',
         scrollTrigger: {
           trigger: slide,
-          start: 'top 85%',
+          start: 'top 88%',
           toggleActions: 'play none none reverse',
         },
       });
@@ -87,7 +104,12 @@ function initMobileOrReduced(slides, navBtns, animate) {
   navBtns.forEach((btn) => {
     btn.addEventListener('click', () => {
       const idx = Number(btn.dataset.chapter);
-      slides[idx]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const target = slides[idx];
+      if (target) {
+        navBtns.forEach((b) => b.classList.remove('is-active'));
+        btn.classList.add('is-active');
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     });
   });
 
@@ -107,6 +129,7 @@ function initDesktopCinema(ctx) {
       pin: stage,
       pinSpacing: false,
       anticipatePin: 1,
+      invalidateOnRefresh: true,
       onUpdate: (self) => updateUI(self.progress),
     },
   });
