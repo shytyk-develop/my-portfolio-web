@@ -1,3 +1,7 @@
+.stack-list li {
+  line-height: 1.55;
+}
+
 .stack-item {
   transition: all 0.4s var(--cinematic-ease);
   background: var(--card-bg);

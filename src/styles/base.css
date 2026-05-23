@@ -233,6 +233,18 @@ body {
   #projects-lock-wrapper {
     min-height: 420px;
   }
+
+  .scanline {
+    display: none;
+  }
+
+  #uptime-display {
+    display: none;
+  }
+
+  .section-heading__line {
+    display: none;
+  }
 }
 
 @media (min-width: 768px) {

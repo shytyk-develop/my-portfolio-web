@@ -10,9 +10,9 @@ export function initWorkflow() {
     .map(
       (step, i) => `
     <button type="button" class="workflow-step${i === 0 ? ' is-active' : ''}" data-step="${step.id}" data-cinematic="card">
-      <span class="workflow-step__phase">${step.phase}</span>
+      <span class="workflow-step__phase text-accent-inline">${step.phase}</span>
       <span class="workflow-step__title">${step.title}</span>
-      <span class="workflow-step__subtitle">${step.subtitle}</span>
+      <span class="workflow-step__subtitle text-muted">${step.subtitle}</span>
     </button>`
     )
     .join('');
@@ -20,12 +20,12 @@ export function initWorkflow() {
   function renderDetail(step) {
     detail.innerHTML = `
       <div class="workflow-detail__head">
-        <span class="workflow-detail__phase">${step.phase}</span>
+        <span class="text-label">Phase ${step.phase}</span>
         <h3 class="workflow-detail__title">${step.title}</h3>
       </div>
       <p class="workflow-detail__text">${step.detail}</p>
       <div class="workflow-detail__tags">
-        ${step.tags.map((t) => `<span class="workflow-detail__tag">${t}</span>`).join('')}
+        ${step.tags.map((t) => `<span class="workflow-detail__tag"><span class="text-prefix">·</span> ${t}</span>`).join('')}
       </div>`;
     detail.classList.remove('workflow-detail--swap');
     requestAnimationFrame(() => detail.classList.add('workflow-detail--swap'));

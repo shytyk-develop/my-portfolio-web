@@ -101,7 +101,7 @@
     <!-- HERO -->
     <section id="home" class="max-w-6xl mx-auto px-4 md:px-6 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 mb-16 md:mb-24 mt-4 hero-parallax-wrap">
       <div>
-        <div class="text-[var(--text-dim)] text-[9px] md:text-[10px] mb-3 md:mb-4 uppercase" data-cinematic="hero-tag">Identity_Verified // ID: 0x7E3A</div>
+        <div class="text-[var(--text-dim)] text-[9px] md:text-[10px] mb-3 md:mb-4 uppercase" data-cinematic="hero-tag"><span class="text-label">Status</span> <span class="text-value">Identity verified</span> <span class="text-muted">// 0x7E3A</span></div>
         <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tighter mb-6 md:mb-8 leading-none uppercase overflow-hidden">
           <span class="hero-title-line block"><span>JAN SHYTYK</span></span>
           <span class="hero-title-line block text-[var(--accent)] text-4xl"><span>Python Backend Developer</span></span>
@@ -109,9 +109,9 @@
         <div class="border-l-2 border-accent pt-4 pb-4 pl-4 md:pl-6 pr-4 md:pr-6 mb-6 md:mb-8" data-cinematic="hero-bio">
           <div class="text-[var(--text-dim)] text-[9px] md:text-[10px] uppercase mb-2">System_Bio:</div>
           <p class="text-[var(--text-main)] leading-relaxed text-xs md:text-sm mb-4">
-            Building clean, maintainable, and scalable server-side solutions. Focused on bridging the gap between complex business logic and efficient technical execution.
+            Building <span class="text-highlight">clean, maintainable backends</span> for products that need reliable APIs, automation, and data flows — from idea to production.
           </p>
-          <p class="text-[var(--text-main)] text-[10px] md:text-xs italic">&gt;_ Robust code for seamless experience</p>
+          <p class="text-[10px] md:text-xs text-muted"><span class="text-prefix">&gt;</span> Robust code for seamless experience</p>
         </div>
         <div class="hero-actions" data-cinematic="hero-actions">
           <button type="button" onclick="openTerminalWithWelcome()" class="hero-btn hero-btn--primary">
@@ -154,62 +154,66 @@
     <section id="stack" class="max-w-6xl mx-auto px-4 md:px-6 mb-16 md:mb-24">
       <div class="section-heading" data-cinematic="heading">
         <span class="section-heading__num">01</span>
-        <h2 class="section-heading__title">TECH INVENTORY // MY STACK</h2>
+        <h2 class="section-heading__title">
+          <span class="section-heading__title-main">TECH INVENTORY</span>
+          <span class="section-heading__title-sub">MY STACK</span>
+        </h2>
         <div class="section-heading__line"></div>
       </div>
+      <p class="section-lead px-0" data-cinematic="fade">Tools I use daily — <span class="text-accent-inline">expand a card</span> to see details.</p>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 auto-rows-min">
         <div class="stack-item p-4 md:p-6 border-strict cursor-pointer" onclick="toggleStack(this)" data-cinematic="card">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3"><i data-lucide="code-2" class="w-4 h-4 md:w-5 md:h-5 text-[var(--accent)]"></i><span class="font-bold uppercase text-xs md:text-sm">Languages</span></div>
-            <span class="text-[var(--text-dim)] text-[9px] md:text-[10px]">[ CLK_TO_EXPAND ]</span>
+            <span class="stack-expand-hint text-[var(--text-dim)] text-[9px] md:text-[10px] hidden sm:inline">Tap to expand</span>
           </div>
           <div class="stack-details mt-4">
-            <div class="loading-sim text-[var(--accent)] text-[9px] md:text-[10px] mb-4">LOADING_CORE_RESOURCES...</div>
-            <ul class="text-[11px] md:text-xs space-y-2 text-[var(--text-dim)]">
-              <li><span class="text-[var(--text-main)] font-bold">&gt; Python 3.12:</span> AsyncIO, FastAPI, Django (DRF), Pytest</li>
-              <li><span class="text-[var(--text-main)] font-bold">&gt; SQL:</span> Query Optimization, CTE</li>
-              <li><span class="text-[var(--text-main)] font-bold">&gt; AI Integration:</span> OpenAI API, LangChain, Gemini API</li>
+            <div class="loading-sim text-[var(--accent)] text-[9px] md:text-[10px] mb-4">Core stack</div>
+            <ul class="stack-list text-[11px] md:text-xs space-y-2">
+              <li><span class="text-prefix">&gt;</span> <span class="text-key">Python 3.12</span><span class="text-sep"> — </span><span class="text-muted">AsyncIO, FastAPI, Django (DRF), Pytest</span></li>
+              <li><span class="text-prefix">&gt;</span> <span class="text-key">SQL</span><span class="text-sep"> — </span><span class="text-muted">Query optimization, CTE, indexing</span></li>
+              <li><span class="text-prefix">&gt;</span> <span class="text-key">AI APIs</span><span class="text-sep"> — </span><span class="text-muted">OpenAI, LangChain, Gemini</span></li>
             </ul>
           </div>
         </div>
         <div class="stack-item p-4 md:p-6 border-strict cursor-pointer" onclick="toggleStack(this)" data-cinematic="card">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3"><i data-lucide="database" class="w-4 h-4 md:w-5 md:h-5 text-[var(--accent)]"></i><span class="font-bold uppercase text-xs md:text-sm">Databases</span></div>
-            <span class="text-[var(--text-dim)] text-[9px] md:text-[10px]">[ CLK_TO_EXPAND ]</span>
+            <span class="stack-expand-hint text-[var(--text-dim)] text-[9px] md:text-[10px] hidden sm:inline">Tap to expand</span>
           </div>
           <div class="stack-details mt-4">
-            <div class="loading-sim text-[var(--accent)] text-[9px] md:text-[10px] mb-4">MOUNTING_PERSISTENT_STORAGE...</div>
-            <ul class="text-[11px] md:text-xs space-y-2 text-[var(--text-dim)]">
-              <li><span class="text-[var(--text-main)] font-bold">&gt; PostgreSQL:</span> SQLAlchemy, Alembic, Indexing, JSON</li>
-              <li><span class="text-[var(--text-main)] font-bold">&gt; Redis:</span> Caching</li>
-              <li><span class="text-[var(--text-main)] font-bold">&gt; Architecture:</span> Database Design</li>
+            <div class="loading-sim text-[var(--accent)] text-[9px] md:text-[10px] mb-4">Data layer</div>
+            <ul class="stack-list text-[11px] md:text-xs space-y-2">
+              <li><span class="text-prefix">&gt;</span> <span class="text-key">PostgreSQL</span><span class="text-sep"> — </span><span class="text-muted">SQLAlchemy, Alembic, JSON, indexing</span></li>
+              <li><span class="text-prefix">&gt;</span> <span class="text-key">Redis</span><span class="text-sep"> — </span><span class="text-muted">Caching, sessions</span></li>
+              <li><span class="text-prefix">&gt;</span> <span class="text-key">Design</span><span class="text-sep"> — </span><span class="text-muted">Schema modeling, migrations</span></li>
             </ul>
           </div>
         </div>
         <div class="stack-item p-4 md:p-6 border-strict cursor-pointer" onclick="toggleStack(this)" data-cinematic="card">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3"><i data-lucide="box" class="w-4 h-4 md:w-5 md:h-5 text-[var(--accent)]"></i><span class="font-bold uppercase text-xs md:text-sm">Infrastructure</span></div>
-            <span class="text-[var(--text-dim)] text-[9px] md:text-[10px]">[ CLK_TO_EXPAND ]</span>
+            <span class="stack-expand-hint text-[var(--text-dim)] text-[9px] md:text-[10px] hidden sm:inline">Tap to expand</span>
           </div>
           <div class="stack-details mt-4">
-            <div class="loading-sim text-[var(--accent)] text-[9px] md:text-[10px] mb-4">MOUNTING_ENV...</div>
-            <ul class="text-[11px] md:text-xs space-y-2 text-[var(--text-dim)]">
-              <li><span class="text-[var(--text-main)] font-bold">&gt; Docker:</span> Containerization, Multi-stage builds</li>
-              <li><span class="text-[var(--text-main)] font-bold">&gt; AWS:</span> S3, Lambda (Serverless)</li>
-              <li><span class="text-[var(--text-main)] font-bold">&gt; CI/CD:</span> GitHub Actions, GitLab CI</li>
+            <div class="loading-sim text-[var(--accent)] text-[9px] md:text-[10px] mb-4">Infrastructure</div>
+            <ul class="stack-list text-[11px] md:text-xs space-y-2">
+              <li><span class="text-prefix">&gt;</span> <span class="text-key">Docker</span><span class="text-sep"> — </span><span class="text-muted">Multi-stage builds, compose</span></li>
+              <li><span class="text-prefix">&gt;</span> <span class="text-key">AWS</span><span class="text-sep"> — </span><span class="text-muted">S3, Lambda</span></li>
+              <li><span class="text-prefix">&gt;</span> <span class="text-key">CI/CD</span><span class="text-sep"> — </span><span class="text-muted">GitHub Actions, GitLab CI</span></li>
             </ul>
           </div>
         </div>
         <div class="stack-item p-4 md:p-6 border-strict cursor-pointer" onclick="toggleStack(this)" data-cinematic="card">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3"><i data-lucide="blocks" class="w-4 h-4 md:w-5 md:h-5 text-[var(--accent)]"></i><span class="font-bold uppercase text-xs md:text-sm">INTEGRATIONS</span></div>
-            <span class="text-[var(--text-dim)] text-[9px] md:text-[10px]">[ CLK_TO_EXPAND ]</span>
+            <span class="stack-expand-hint text-[var(--text-dim)] text-[9px] md:text-[10px] hidden sm:inline">Tap to expand</span>
           </div>
           <div class="stack-details mt-4">
-            <div class="loading-sim text-[var(--accent)] text-[9px] md:text-[10px] mb-4">INITIALIZING_SYSTEM_TOOLS...</div>
-            <ul class="text-[11px] md:text-xs space-y-2 text-[var(--text-dim)]">
-              <li><span class="text-[var(--text-main)] font-bold">&gt; API Design:</span> RESTful API, WebSockets, CORS</li>
-              <li><span class="text-[var(--text-main)] font-bold">&gt; Version Control:</span> Git Flow, GitHub, Code Review</li>
+            <div class="loading-sim text-[var(--accent)] text-[9px] md:text-[10px] mb-4">Integrations</div>
+            <ul class="stack-list text-[11px] md:text-xs space-y-2">
+              <li><span class="text-prefix">&gt;</span> <span class="text-key">APIs</span><span class="text-sep"> — </span><span class="text-muted">REST, WebSockets, OpenAPI</span></li>
+              <li><span class="text-prefix">&gt;</span> <span class="text-key">Git</span><span class="text-sep"> — </span><span class="text-muted">Git Flow, reviews, CI hooks</span></li>
             </ul>
           </div>
         </div>
@@ -278,9 +282,7 @@
         <h2 class="section-heading__title">DEV_WORKFLOW // PIPELINE</h2>
         <div class="section-heading__line"></div>
       </div>
-      <p class="text-[var(--text-dim)] text-[10px] md:text-xs uppercase tracking-widest mb-6 max-w-xl" data-cinematic="fade">
-        How I move from idea to production — select a phase
-      </p>
+      <p class="section-lead" data-cinematic="fade">How I move from <span class="text-accent-inline">discovery</span> to <span class="text-accent-inline">production</span> — pick a phase.</p>
       <div class="workflow-layout">
         <div id="workflow-track"></div>
         <div id="workflow-detail" class="workflow-detail"></div>
@@ -294,9 +296,7 @@
         <h2 class="section-heading__title">SYSTEM_SIGNALS // LIVE_METRICS</h2>
         <div class="section-heading__line"></div>
       </div>
-      <p class="text-[var(--text-dim)] text-[10px] md:text-xs uppercase tracking-widest mb-6 max-w-xl" data-cinematic="fade">
-        Portfolio stats served by FastAPI — not hardcoded on the client
-      </p>
+      <p class="section-lead" data-cinematic="fade">Live counters from <span class="text-accent-inline">GET /api/metrics</span> — served by the backend.</p>
       <div id="signals-grid"></div>
     </section>
 
