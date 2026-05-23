@@ -84,42 +84,6 @@
   color: var(--accent);
 }
 
-.stack-bars {
-  margin-top: 1rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.stack-bar-row {
-  display: grid;
-  grid-template-columns: 5.5rem 1fr;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.stack-bar-row__label {
-  font-size: 9px;
-  color: var(--text-dim);
-}
-
-.stack-bar {
-  height: 4px;
-  background: var(--border);
-  position: relative;
-  overflow: hidden;
-}
-
-.stack-bar span {
-  display: block;
-  height: 100%;
-  width: 0%;
-  background: var(--accent);
-  transition: width 0.8s var(--cinematic-ease);
-}
-
 .contact-form-panel {
   border: 1px solid var(--border);
   background: var(--card-bg);
