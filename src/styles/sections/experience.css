@@ -24,35 +24,6 @@
   }
 }
 
-.experience-jump {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 1.25rem;
-}
-
-.experience-jump__btn {
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  text-decoration: none;
-  color: var(--text-dim);
-  border: 1px solid var(--border);
-  padding: 0.55rem 0.85rem;
-  min-height: 44px;
-  display: inline-flex;
-  align-items: center;
-  transition: border-color 0.2s, color 0.2s, background 0.2s;
-}
-
-.experience-jump__btn:hover,
-.experience-jump__btn.is-active {
-  border-color: var(--accent);
-  color: var(--accent);
-  background: color-mix(in srgb, var(--accent) 8%, transparent);
-}
-
 .experience-cinema__scroll-hint {
   display: flex;
   align-items: center;

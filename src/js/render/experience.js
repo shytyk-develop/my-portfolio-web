@@ -53,13 +53,6 @@ export function renderExperienceSection() {
     )
     .join('');
 
-  const jumpHtml = experience
-    .map(
-      (job) =>
-        `<a href="#exp-${job.id}" class="experience-jump__btn">${shortCompanyName(job.company)}</a>`
-    )
-    .join('');
-
   const dotsHtml = experience
     .map((_, i) => `<span class="experience-progress__dot${i === 0 ? ' is-active' : ''}" data-dot="${i}"></span>`)
     .join('');
@@ -79,9 +72,6 @@ export function renderExperienceSection() {
           <span class="experience-cinema__tagline-desktop">Roles where I shipped <span class="text-accent-inline">automation, APIs, and internal tools</span> — scroll on desktop to step through chapters.</span>
           <span class="experience-cinema__tagline-mobile">Tap a role below or scroll through each position.</span>
         </p>
-        <nav class="experience-jump lg:hidden" aria-label="Jump to role">
-          ${jumpHtml}
-        </nav>
         <div class="experience-cinema__scroll-hint experience-stage__chrome hidden lg:flex" data-cinematic="fade">
           <span>SCROLL TO PLAY</span>
           <div class="experience-cinema__scroll-hint-line"></div>

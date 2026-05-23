@@ -101,30 +101,14 @@ function initMobileOrReduced(slides, navBtns, animate) {
     }
   });
 
-  const setActiveChapter = (idx) => {
-    navBtns.forEach((b, i) => b.classList.toggle('is-active', i === idx));
-    document.querySelectorAll('.experience-jump__btn').forEach((link, i) => {
-      link.classList.toggle('is-active', i === idx);
-    });
-  };
-
   navBtns.forEach((btn) => {
     btn.addEventListener('click', () => {
       const idx = Number(btn.dataset.chapter);
       const target = slides[idx];
       if (target) {
-        setActiveChapter(idx);
+        navBtns.forEach((b, i) => b.classList.toggle('is-active', i === idx));
         target.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
-    });
-  });
-
-  document.querySelectorAll('.experience-jump__btn').forEach((link) => {
-    link.addEventListener('click', () => {
-      const id = link.getAttribute('href')?.slice(1);
-      const slide = id ? document.getElementById(id) : null;
-      const idx = slide ? Number(slide.dataset.slide) : -1;
-      if (idx >= 0) setActiveChapter(idx);
     });
   });
 

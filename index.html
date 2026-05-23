@@ -82,16 +82,12 @@
       <a href="#contact" class="site-nav__link">Contact</a>
     </nav>
     <div class="flex items-center gap-3 md:gap-6 text-[10px] tracking-widest text-[var(--text-dim)]">
-      <div class="api-status hidden sm:flex" title="Backend health">
-        <span id="api-status-dot" class="api-status-dot"></span>
-        <span id="api-status-label">API …</span>
-      </div>
       <button id="theme-toggle" type="button" onclick="toggleTheme()" title="Switch Theme" aria-label="Toggle theme">
         <i data-lucide="moon" id="theme-icon" class="w-4 h-4"></i>
       </button>
-      <div class="hidden md:flex items-center gap-2">
-        <span class="w-2 h-2 bg-[var(--accent)] animate-pulse"></span>
-        <span id="uptime-display">UPTIME: 00:00:00</span>
+      <div class="header-uptime flex items-center gap-1.5 md:gap-2">
+        <span class="w-2 h-2 bg-[var(--accent)] animate-pulse shrink-0"></span>
+        <span id="uptime-display" class="text-[8px] md:text-[10px] tabular-nums">UPTIME: 00:00:00</span>
       </div>
     </div>
   </header>

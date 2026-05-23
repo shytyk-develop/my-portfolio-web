@@ -238,10 +238,6 @@ body {
     display: none;
   }
 
-  #uptime-display {
-    display: none;
-  }
-
   .section-heading__line {
     display: none;
   }
@@ -271,27 +267,11 @@ body {
   border-bottom-color: var(--accent);
 }
 
-.api-status {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  font-size: 8px;
-  letter-spacing: 0.1em;
+.header-uptime {
   color: var(--text-dim);
-}
-
-.api-status-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--text-dim);
-}
-
-.api-status-dot--online {
-  background: var(--accent);
-  box-shadow: 0 0 8px var(--accent-glow);
-}
-
-.api-status-dot--offline {
-  background: var(--danger);
+  letter-spacing: 0.06em;
+  max-width: 42vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
