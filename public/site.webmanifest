@@ -1,0 +1,23 @@
+{
+  "name": "Jan Shytyk — Python Backend Developer",
+  "short_name": "Shytyk Dev",
+  "description": "Python Backend Developer. APIs, automation, scalable systems.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#080808",
+  "theme_color": "#080808",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
