@@ -9,14 +9,15 @@ export function initMatrix() {
     return;
   }
 
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext('2d', { alpha: true });
   let width = (canvas.width = window.innerWidth);
   let height = (canvas.height = window.innerHeight);
   let columns = Math.floor(width / 20);
-  const characters = '01ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  const charArray = characters.split('');
+  const charArray = '01ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
   let drops = Array.from({ length: columns }, () => Math.random() * -100);
-  let intervalId = null;
+  let rafId = null;
+  let lastFrame = 0;
+  const frameInterval = isMobile ? 48 : 32;
 
   function draw() {
     const isLight = document.documentElement.getAttribute('data-theme') === 'light';
@@ -26,15 +27,22 @@ export function initMatrix() {
     ctx.font = '14px monospace';
 
     for (let i = 0; i < drops.length; i++) {
-      const text = charArray[Math.floor(Math.random() * charArray.length)];
+      const text = charArray[(Math.random() * charArray.length) | 0];
       ctx.fillText(text, i * 20, drops[i] * 20);
       if (drops[i] * 20 > height && Math.random() > 0.975) drops[i] = 0;
       drops[i]++;
     }
   }
 
-  const fps = isMobile ? 30 : 50;
-  intervalId = setInterval(draw, fps);
+  function loop(timestamp) {
+    if (!document.hidden && timestamp - lastFrame >= frameInterval) {
+      lastFrame = timestamp;
+      draw();
+    }
+    rafId = requestAnimationFrame(loop);
+  }
+
+  rafId = requestAnimationFrame(loop);
 
   window.addEventListener('resize', () => {
     width = canvas.width = window.innerWidth;
@@ -44,11 +52,12 @@ export function initMatrix() {
   });
 
   document.addEventListener('visibilitychange', () => {
-    if (document.hidden && intervalId) {
-      clearInterval(intervalId);
-      intervalId = null;
-    } else if (!document.hidden && !intervalId) {
-      intervalId = setInterval(draw, fps);
+    if (document.hidden && rafId) {
+      cancelAnimationFrame(rafId);
+      rafId = null;
+    } else if (!document.hidden && !rafId) {
+      lastFrame = 0;
+      rafId = requestAnimationFrame(loop);
     }
   });
 }
