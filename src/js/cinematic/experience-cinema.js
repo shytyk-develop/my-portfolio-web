@@ -3,11 +3,46 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 const MOBILE_MQ = '(max-width: 1023px)';
 
+let cleanupFns = [];
+let lastLayoutMobile = null;
+
 function isMobileLayout() {
   return window.matchMedia(MOBILE_MQ).matches;
 }
 
+function slideInner(slide) {
+  return slide.querySelector('.experience-slide__inner') || slide.querySelector('.experience-slide__card');
+}
+
+function runCleanup() {
+  cleanupFns.forEach((fn) => fn());
+  cleanupFns = [];
+}
+
+function onCleanup(fn) {
+  cleanupFns.push(fn);
+}
+
+function bindResizeRefresh() {
+  if (window.__experienceCinemaResizeBound) return;
+  window.__experienceCinemaResizeBound = true;
+
+  let timer;
+  window.addEventListener('resize', () => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      const mobile = isMobileLayout();
+      if (lastLayoutMobile !== mobile) {
+        initExperienceCinema();
+      }
+      ScrollTrigger.refresh();
+    }, 200);
+  });
+}
+
 export function initExperienceCinema() {
+  runCleanup();
+
   const pinWrap = document.getElementById('experience-pin-wrap');
   const stage = document.getElementById('experience-stage');
   const slides = gsap.utils.toArray('.experience-slide');
@@ -20,17 +55,20 @@ export function initExperienceCinema() {
 
   if (!pinWrap || !stage || slides.length === 0) return;
 
+  bindResizeRefresh();
+
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const mobile = isMobileLayout();
+  lastLayoutMobile = mobile;
   const slideCount = slides.length;
 
   applyLayoutMode(pinWrap, stage, mobile);
 
   slides.forEach((slide, i) => {
-    const inner = slide.querySelector('.experience-slide__inner');
+    const inner = slideInner(slide);
     if (mobile || reducedMotion) {
       gsap.set(slide, { clearProps: 'all' });
-      gsap.set(inner, { clearProps: 'all' });
+      if (inner) gsap.set(inner, { clearProps: 'all' });
       slide.style.position = 'relative';
       slide.style.visibility = 'visible';
       slide.style.opacity = '1';
@@ -38,10 +76,11 @@ export function initExperienceCinema() {
       slide.setAttribute('aria-hidden', 'false');
     } else if (i === 0) {
       gsap.set(slide, { visibility: 'visible', opacity: 1 });
+      gsap.set(inner, { y: 0, opacity: 1, filter: 'blur(0px)' });
       slide.classList.add('is-active');
     } else {
       gsap.set(slide, { visibility: 'hidden', opacity: 0 });
-      gsap.set(inner, { y: 60, opacity: 0 });
+      gsap.set(inner, { y: 60, opacity: 0, filter: 'blur(8px)' });
       slide.classList.remove('is-active');
     }
   });
@@ -77,39 +116,87 @@ function applyLayoutMode(pinWrap, stage, mobile) {
   }
 }
 
+function animateSlideContent(tl, slide, position) {
+  const inner = slideInner(slide);
+  if (!inner) return;
+
+  const label = `slide-${slide.dataset.slide}`;
+  tl.addLabel(label, position);
+
+  const company = slide.querySelector('.experience-slide__company');
+  const headline = slide.querySelector('.experience-slide__headline');
+  const desc = slide.querySelector('.experience-slide__desc');
+  const meta = slide.querySelector('.experience-slide__meta');
+  const chapter = slide.querySelector('.experience-slide__chapter');
+  const highlights = slide.querySelectorAll('.experience-slide__highlights li');
+  const tags = slide.querySelectorAll('.experience-slide__tag');
+
+  tl.fromTo(
+    inner,
+    { y: 70, opacity: 0, filter: 'blur(12px)' },
+    { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.65, ease: 'power4.out' },
+    label
+  );
+
+  if (chapter) {
+    tl.fromTo(chapter, { x: 40, opacity: 0 }, { x: 0, opacity: 0.3, duration: 0.5, ease: 'power3.out' }, label);
+  }
+  if (company) {
+    tl.from(company, { y: 28, opacity: 0, duration: 0.45, ease: 'power3.out' }, `${label}+=0.05`);
+  }
+  if (meta) {
+    tl.from(meta, { x: 20, opacity: 0, duration: 0.35, ease: 'power2.out' }, `${label}+=0.08`);
+  }
+  if (headline) {
+    tl.from(headline, { y: 16, opacity: 0, duration: 0.4, ease: 'power2.out' }, `${label}+=0.12`);
+  }
+  if (desc) {
+    tl.from(desc, { y: 12, opacity: 0, duration: 0.35, ease: 'power2.out' }, `${label}+=0.16`);
+  }
+  if (highlights.length) {
+    tl.from(highlights, { x: -24, opacity: 0, stagger: 0.06, duration: 0.35, ease: 'power2.out' }, `${label}+=0.2`);
+  }
+  if (tags.length) {
+    tl.from(tags, { y: 12, opacity: 0, stagger: 0.05, duration: 0.3, ease: 'power2.out' }, `${label}+=0.28`);
+  }
+}
+
 function initMobileOrReduced(slides, navBtns, animate) {
   const progressFill = document.getElementById('exp-progress-fill');
 
   slides.forEach((slide) => {
-    const inner = slide.querySelector('.experience-slide__inner');
+    const inner = slideInner(slide);
     if (inner) {
-      gsap.set(inner, { clearProps: 'all', opacity: 1, y: 0 });
+      gsap.set(inner, { clearProps: 'all', opacity: 1, y: 0, filter: 'none' });
     }
 
-    if (animate) {
-      gsap.from(inner, {
-        opacity: 0,
-        y: 28,
-        duration: 0.75,
-        ease: 'power3.out',
-        scrollTrigger: {
-          trigger: slide,
-          start: 'top 88%',
-          toggleActions: 'play none none reverse',
-        },
+    if (animate && inner) {
+      const st = ScrollTrigger.create({
+        trigger: slide,
+        start: 'top 88%',
+        toggleActions: 'play none none reverse',
+        animation: gsap.from(inner, {
+          opacity: 0,
+          y: 28,
+          duration: 0.75,
+          ease: 'power3.out',
+        }),
       });
+      onCleanup(() => st.kill());
     }
   });
 
   navBtns.forEach((btn) => {
-    btn.addEventListener('click', () => {
+    const handler = () => {
       const idx = Number(btn.dataset.chapter);
       const target = slides[idx];
       if (target) {
         navBtns.forEach((b, i) => b.classList.toggle('is-active', i === idx));
         target.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
-    });
+    };
+    btn.addEventListener('click', handler);
+    onCleanup(() => btn.removeEventListener('click', handler));
   });
 
   if (progressFill) progressFill.style.height = '100%';
@@ -133,46 +220,48 @@ function initDesktopCinema(ctx) {
     },
   });
 
+  onCleanup(() => master.scrollTrigger?.kill());
+  onCleanup(() => master.kill());
+
+  const chrome = stage.querySelectorAll(
+    '.experience-stage__timecode, .experience-progress, .experience-chapter-nav'
+  );
+  if (chrome.length) {
+    master.from(chrome, { opacity: 0, y: 14, duration: 0.35, stagger: 0.06, ease: 'power2.out' }, 0);
+  }
+
+  animateSlideContent(master, slides[0], 0);
+
   slides.forEach((slide, i) => {
     if (i === 0) return;
     const prev = slides[i - 1];
-    const prevInner = prev.querySelector('.experience-slide__inner');
-    const inner = slide.querySelector('.experience-slide__inner');
+    const prevInner = slideInner(prev);
+    const inner = slideInner(slide);
+    const pos = master.duration();
 
     master
-      .to(prevInner, { y: -50, opacity: 0, filter: 'blur(10px)', duration: 0.45, ease: 'power3.in' })
-      .to(prev, { opacity: 0, duration: 0.2 }, '<0.15')
+      .to(prevInner, { y: -50, opacity: 0, filter: 'blur(10px)', duration: 0.45, ease: 'power3.in' }, pos)
+      .to(prev.querySelector('.experience-slide__chapter'), { opacity: 0, x: -30, duration: 0.35, ease: 'power2.in' }, pos)
+      .to(prev, { opacity: 0, duration: 0.2 }, `${pos}+=0.15`)
       .set(prev, { visibility: 'hidden' })
-      .set(slide, { visibility: 'visible', opacity: 1 })
-      .fromTo(
-        inner,
-        { y: 70, opacity: 0, filter: 'blur(12px)' },
-        { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.65, ease: 'power4.out' }
-      )
-      .from(
-        slide.querySelectorAll('.experience-slide__highlights li'),
-        { x: -24, opacity: 0, stagger: 0.06, duration: 0.35, ease: 'power2.out' },
-        '<0.2'
-      )
-      .from(
-        slide.querySelectorAll('.experience-slide__tag'),
-        { y: 12, opacity: 0, stagger: 0.05, duration: 0.3, ease: 'power2.out' },
-        '<0.1'
-      );
+      .set(slide, { visibility: 'visible', opacity: 1 });
+
+    animateSlideContent(master, slide, `${pos}+=0.05`);
   });
 
   if (hintLine) {
-    gsap.from(hintLine, {
-      scaleX: 0,
-      transformOrigin: 'left',
-      duration: 1.2,
-      ease: 'power3.inOut',
-      scrollTrigger: {
-        trigger: pinWrap,
-        start: 'top 95%',
-        toggleActions: 'play none none reverse',
-      },
+    const hintSt = ScrollTrigger.create({
+      trigger: pinWrap,
+      start: 'top 95%',
+      toggleActions: 'play none none reverse',
+      animation: gsap.from(hintLine, {
+        scaleX: 0,
+        transformOrigin: 'left',
+        duration: 1.2,
+        ease: 'power3.inOut',
+      }),
     });
+    onCleanup(() => hintSt.kill());
   }
 
   function updateUI(progress) {
@@ -201,13 +290,15 @@ function initDesktopCinema(ctx) {
   }
 
   navBtns.forEach((btn) => {
-    btn.addEventListener('click', () => {
+    const handler = () => {
       const idx = Number(btn.dataset.chapter);
       const st = master.scrollTrigger;
       if (!st) return;
       const target = (idx + 0.15) / slideCount;
       const y = st.start + (st.end - st.start) * target;
       window.scrollTo({ top: y, behavior: 'smooth' });
-    });
+    };
+    btn.addEventListener('click', handler);
+    onCleanup(() => btn.removeEventListener('click', handler));
   });
 }

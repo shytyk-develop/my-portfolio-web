@@ -26,6 +26,7 @@ export function initCinematic() {
     initHeroCinematic();
     initSectionReveals();
     initExperienceCinema();
+    initWorkflowCinematic();
     initRevealDivider();
     initNavHighlight();
     ScrollTrigger.refresh();
@@ -97,8 +98,11 @@ function initHeroCinematic() {
     .from('#home .hero-title-line', { y: '105%', duration: 1, stagger: 0.1, ease: 'power4.out' }, 0.3)
     .from('#home [data-cinematic="hero-bio"]', { opacity: 0, x: -24, duration: 0.8 }, 0.55)
     .from('#home [data-cinematic="hero-actions"]', { opacity: 0, y: 12, duration: 0.55, clearProps: 'opacity,transform' }, 0.75)
-    .from('#home [data-cinematic="hero-card"]', { opacity: 0, scale: 0.96, duration: 0.95 }, 0.45)
-    .from('#home .hero-scroll-hint', { opacity: 0, y: 8, duration: 0.5 }, 1.05);
+    .from('#home [data-cinematic="hero-card"]', { opacity: 0, scale: 0.96, duration: 0.95 }, 0.45);
+
+  if (window.matchMedia('(max-width: 1023px)').matches) {
+    tl.from('#home .hero-scroll-hint', { opacity: 0, y: 8, duration: 0.5 }, 1.05);
+  }
 
   gsap.set('#home .hero-actions, #home .hero-btn', { opacity: 1, visibility: 'visible' });
 
@@ -114,9 +118,74 @@ function initHeroCinematic() {
   });
 }
 
+function initWorkflowCinematic() {
+  const section = document.getElementById('workflow');
+  if (!section) return;
+
+  const heading = section.querySelector('[data-cinematic="heading"]');
+  const lead = section.querySelector('.section-lead');
+  const steps = gsap.utils.toArray('#workflow .workflow-step');
+  const detail = section.querySelector('.workflow-detail');
+  const layout = section.querySelector('.workflow-layout');
+
+  const tl = gsap.timeline({
+    scrollTrigger: {
+      trigger: section,
+      start: 'top 82%',
+      toggleActions: 'play none none reverse',
+    },
+  });
+
+  if (lead) {
+    tl.from(lead, { opacity: 0, y: 20, duration: 0.65, ease: 'power3.out' }, heading ? 0.12 : 0);
+  }
+
+  if (layout) {
+    tl.from(layout, { opacity: 0, y: 28, duration: 0.85, ease: 'power3.out' }, 0.15);
+  }
+
+  if (steps.length) {
+    tl.from(
+      steps,
+      {
+        opacity: 0,
+        x: -28,
+        duration: 0.55,
+        stagger: 0.08,
+        ease: 'power3.out',
+      },
+      0.28
+    );
+  }
+
+  if (detail) {
+    tl.from(detail, { opacity: 0, x: 32, duration: 0.75, ease: 'power3.out' }, 0.32);
+
+    const detailParts = detail.querySelectorAll(
+      '.workflow-detail__head, .workflow-detail__text, .workflow-detail__tag'
+    );
+    if (detailParts.length) {
+      tl.from(
+        detailParts,
+        { opacity: 0, y: 14, duration: 0.45, stagger: 0.07, ease: 'power2.out' },
+        0.45
+      );
+    }
+  }
+
+  steps.forEach((step) => {
+    step.addEventListener('mouseenter', () => {
+      gsap.to(step, { x: 4, duration: 0.25, ease: 'power2.out' });
+    });
+    step.addEventListener('mouseleave', () => {
+      gsap.to(step, { x: 0, duration: 0.3, ease: 'power2.out' });
+    });
+  });
+}
+
 function initSectionReveals() {
   gsap.utils.toArray('section[id]').forEach((section) => {
-    if (section.id === 'experience' || section.id === 'reveal-section') return;
+    if (section.id === 'experience' || section.id === 'reveal-section' || section.id === 'workflow') return;
 
     gsap.from(section, {
       opacity: 0.85,

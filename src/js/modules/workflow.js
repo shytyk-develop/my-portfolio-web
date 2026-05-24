@@ -9,7 +9,7 @@ export function initWorkflow() {
   track.innerHTML = workflowSteps
     .map(
       (step, i) => `
-    <button type="button" class="workflow-step${i === 0 ? ' is-active' : ''}" data-step="${step.id}" data-cinematic="card">
+    <button type="button" class="workflow-step${i === 0 ? ' is-active' : ''}" data-step="${step.id}">
       <span class="workflow-step__phase text-accent-inline">${step.phase}</span>
       <span class="workflow-step__title">${step.title}</span>
       <span class="workflow-step__subtitle text-muted">${step.subtitle}</span>
@@ -20,7 +20,7 @@ export function initWorkflow() {
   function renderDetail(step) {
     detail.innerHTML = `
       <div class="workflow-detail__head">
-        <span class="text-label">Phase ${step.phase}</span>
+        <span class="text-label workflow-detail__phase">Phase ${step.phase}</span>
         <h3 class="workflow-detail__title">${step.title}</h3>
       </div>
       <p class="workflow-detail__text">${step.detail}</p>

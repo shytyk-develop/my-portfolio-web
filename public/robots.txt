@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://test-portfolio.vercel.app/sitemap.xml
+Sitemap: https://jan-shytyk.vercel.app/sitemap.xml

@@ -58,6 +58,12 @@
   text-transform: uppercase;
 }
 
+@media (min-width: 1024px) {
+  .hero-scroll-hint {
+    display: none !important;
+  }
+}
+
 .hero-scroll-hint__line {
   width: 1px;
   height: 28px;

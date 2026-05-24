@@ -14,6 +14,7 @@ export function renderExperienceSection() {
       (job, i) => `
     <article class="experience-slide${i === 0 ? ' is-active' : ''}" id="exp-${job.id}" data-slide="${i}" data-job="${job.id}" aria-hidden="${i !== 0}">
       <span class="experience-slide__chapter experience-stage__chrome" aria-hidden="true">${job.chapter}</span>
+      <div class="experience-slide__inner">
       <div class="experience-slide__card">
         <header class="experience-slide__header">
           <span class="text-chip${job.status === 'ARCHIVE' ? ' text-chip--archive' : ''}">${job.status}</span>
@@ -38,6 +39,7 @@ export function renderExperienceSection() {
             ${job.tags.map((t) => `<span class="experience-slide__tag">${t}</span>`).join('')}
           </div>
         </div>
+      </div>
       </div>
     </article>`
     )

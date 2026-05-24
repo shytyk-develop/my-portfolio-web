@@ -57,10 +57,16 @@
   justify-content: center;
 }
 
+/* Slide content wrapper (GSAP target) */
+.experience-slide__inner {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+}
+
 /* Slide card */
 .experience-slide__card {
   position: relative;
-  z-index: 1;
 }
 
 .experience-slide__header {
