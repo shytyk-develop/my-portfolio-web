@@ -2,6 +2,10 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 const MOBILE_MQ = '(max-width: 1023px)';
+const ENTER_DURATION = 0.75;
+const HOLD_DURATION = 1;
+const CROSSFADE_DURATION = 1.35;
+const FADE_EASE = 'power2.inOut';
 
 let cleanupFns = [];
 let lastLayoutMobile = null;
@@ -66,6 +70,7 @@ export function initExperienceCinema() {
 
   slides.forEach((slide, i) => {
     const inner = slideInner(slide);
+    const chapter = slide.querySelector('.experience-slide__chapter');
     if (mobile || reducedMotion) {
       gsap.set(slide, { clearProps: 'all' });
       if (inner) gsap.set(inner, { clearProps: 'all' });
@@ -77,10 +82,12 @@ export function initExperienceCinema() {
     } else if (i === 0) {
       gsap.set(slide, { visibility: 'visible', opacity: 1 });
       gsap.set(inner, { y: 0, opacity: 1, filter: 'blur(0px)' });
+      if (chapter) gsap.set(chapter, { x: 0, opacity: 0.3 });
       slide.classList.add('is-active');
     } else {
       gsap.set(slide, { visibility: 'hidden', opacity: 0 });
-      gsap.set(inner, { y: 60, opacity: 0, filter: 'blur(8px)' });
+      gsap.set(inner, { y: 48, opacity: 0, filter: 'blur(10px)' });
+      if (chapter) gsap.set(chapter, { x: 24, opacity: 0 });
       slide.classList.remove('is-active');
     }
   });
@@ -116,49 +123,81 @@ function applyLayoutMode(pinWrap, stage, mobile) {
   }
 }
 
-function animateSlideContent(tl, slide, position) {
+/** First slide entrance — whole card moves as one unit */
+function enterSlide(tl, slide, position) {
   const inner = slideInner(slide);
-  if (!inner) return;
-
-  const label = `slide-${slide.dataset.slide}`;
-  tl.addLabel(label, position);
-
-  const company = slide.querySelector('.experience-slide__company');
-  const headline = slide.querySelector('.experience-slide__headline');
-  const desc = slide.querySelector('.experience-slide__desc');
-  const meta = slide.querySelector('.experience-slide__meta');
   const chapter = slide.querySelector('.experience-slide__chapter');
-  const highlights = slide.querySelectorAll('.experience-slide__highlights li');
-  const tags = slide.querySelectorAll('.experience-slide__tag');
 
-  tl.fromTo(
-    inner,
-    { y: 70, opacity: 0, filter: 'blur(12px)' },
-    { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.65, ease: 'power4.out' },
-    label
-  );
+  tl.set(slide, { visibility: 'visible', opacity: 1 }, position);
+
+  if (inner) {
+    tl.fromTo(
+      inner,
+      { y: 44, opacity: 0, filter: 'blur(8px)' },
+      { y: 0, opacity: 1, filter: 'blur(0px)', duration: ENTER_DURATION, ease: 'power3.out' },
+      position
+    );
+  }
 
   if (chapter) {
-    tl.fromTo(chapter, { x: 40, opacity: 0 }, { x: 0, opacity: 0.3, duration: 0.5, ease: 'power3.out' }, label);
+    tl.fromTo(
+      chapter,
+      { x: 28, opacity: 0 },
+      { x: 0, opacity: 0.3, duration: ENTER_DURATION * 0.9, ease: 'power3.out' },
+      position
+    );
   }
-  if (company) {
-    tl.from(company, { y: 28, opacity: 0, duration: 0.45, ease: 'power3.out' }, `${label}+=0.05`);
+}
+
+/** Overlapping crossfade — no instant visibility/opacity jumps */
+function crossfadeSlides(tl, outgoing, incoming, position) {
+  const outInner = slideInner(outgoing);
+  const inInner = slideInner(incoming);
+  const outChapter = outgoing.querySelector('.experience-slide__chapter');
+  const inChapter = incoming.querySelector('.experience-slide__chapter');
+
+  tl.set([outgoing, incoming], { visibility: 'visible' }, position);
+  tl.set(incoming, { opacity: 0 }, position);
+  if (inInner) tl.set(inInner, { y: 48, opacity: 0, filter: 'blur(10px)' }, position);
+  if (inChapter) tl.set(inChapter, { x: 24, opacity: 0 }, position);
+
+  if (outInner) {
+    tl.to(
+      outInner,
+      { y: -40, opacity: 0, filter: 'blur(10px)', duration: CROSSFADE_DURATION, ease: FADE_EASE },
+      position
+    );
   }
-  if (meta) {
-    tl.from(meta, { x: 20, opacity: 0, duration: 0.35, ease: 'power2.out' }, `${label}+=0.08`);
+
+  if (outChapter) {
+    tl.to(
+      outChapter,
+      { opacity: 0, x: -24, duration: CROSSFADE_DURATION * 0.9, ease: FADE_EASE },
+      position
+    );
   }
-  if (headline) {
-    tl.from(headline, { y: 16, opacity: 0, duration: 0.4, ease: 'power2.out' }, `${label}+=0.12`);
+
+  tl.to(outgoing, { opacity: 0, duration: CROSSFADE_DURATION, ease: FADE_EASE }, position);
+
+  tl.to(incoming, { opacity: 1, duration: CROSSFADE_DURATION, ease: FADE_EASE }, position);
+
+  if (inInner) {
+    tl.to(
+      inInner,
+      { y: 0, opacity: 1, filter: 'blur(0px)', duration: CROSSFADE_DURATION, ease: FADE_EASE },
+      position
+    );
   }
-  if (desc) {
-    tl.from(desc, { y: 12, opacity: 0, duration: 0.35, ease: 'power2.out' }, `${label}+=0.16`);
+
+  if (inChapter) {
+    tl.to(
+      inChapter,
+      { x: 0, opacity: 0.3, duration: CROSSFADE_DURATION * 0.95, ease: FADE_EASE },
+      position
+    );
   }
-  if (highlights.length) {
-    tl.from(highlights, { x: -24, opacity: 0, stagger: 0.06, duration: 0.35, ease: 'power2.out' }, `${label}+=0.2`);
-  }
-  if (tags.length) {
-    tl.from(tags, { y: 12, opacity: 0, stagger: 0.05, duration: 0.3, ease: 'power2.out' }, `${label}+=0.28`);
-  }
+
+  tl.set(outgoing, { visibility: 'hidden' }, position + CROSSFADE_DURATION);
 }
 
 function initMobileOrReduced(slides, navBtns, animate) {
@@ -206,12 +245,14 @@ function initDesktopCinema(ctx) {
   const { pinWrap, stage, slides, slideCount, progressFill, timecodeEl, frameEl, dots, navBtns, hintLine } =
     ctx;
 
+  const chapterSwitchAt = [];
+
   const master = gsap.timeline({
     scrollTrigger: {
       trigger: pinWrap,
       start: 'top top',
       end: 'bottom bottom',
-      scrub: 1.4,
+      scrub: 2,
       pin: stage,
       pinSpacing: false,
       anticipatePin: 1,
@@ -226,28 +267,30 @@ function initDesktopCinema(ctx) {
   const chrome = stage.querySelectorAll(
     '.experience-stage__timecode, .experience-progress, .experience-chapter-nav'
   );
+  let cursor = 0;
+
   if (chrome.length) {
-    master.from(chrome, { opacity: 0, y: 14, duration: 0.35, stagger: 0.06, ease: 'power2.out' }, 0);
+    master.from(chrome, { opacity: 0, y: 14, duration: 0.35, stagger: 0.06, ease: 'power2.out' }, cursor);
+    cursor += 0.35;
   }
 
-  animateSlideContent(master, slides[0], 0);
+  enterSlide(master, slides[0], cursor);
+  cursor += ENTER_DURATION + HOLD_DURATION;
+  chapterSwitchAt.push({ idx: 0, time: 0 });
 
-  slides.forEach((slide, i) => {
-    if (i === 0) return;
-    const prev = slides[i - 1];
-    const prevInner = slideInner(prev);
-    const inner = slideInner(slide);
-    const pos = master.duration();
+  for (let i = 1; i < slides.length; i++) {
+    const switchTime = cursor + CROSSFADE_DURATION * 0.5;
+    chapterSwitchAt.push({ idx: i, time: switchTime });
+    crossfadeSlides(master, slides[i - 1], slides[i], cursor);
+    cursor += CROSSFADE_DURATION;
+    if (i < slides.length - 1) {
+      cursor += HOLD_DURATION;
+    } else {
+      cursor += HOLD_DURATION * 0.6;
+    }
+  }
 
-    master
-      .to(prevInner, { y: -50, opacity: 0, filter: 'blur(10px)', duration: 0.45, ease: 'power3.in' }, pos)
-      .to(prev.querySelector('.experience-slide__chapter'), { opacity: 0, x: -30, duration: 0.35, ease: 'power2.in' }, pos)
-      .to(prev, { opacity: 0, duration: 0.2 }, `${pos}+=0.15`)
-      .set(prev, { visibility: 'hidden' })
-      .set(slide, { visibility: 'visible', opacity: 1 });
-
-    animateSlideContent(master, slide, `${pos}+=0.05`);
-  });
+  const totalDuration = master.duration();
 
   if (hintLine) {
     const hintSt = ScrollTrigger.create({
@@ -264,11 +307,20 @@ function initDesktopCinema(ctx) {
     onCleanup(() => hintSt.kill());
   }
 
+  function activeChapterIndex(progress) {
+    const t = progress * totalDuration;
+    let idx = 0;
+    for (const point of chapterSwitchAt) {
+      if (t >= point.time) idx = point.idx;
+    }
+    return idx;
+  }
+
   function updateUI(progress) {
     const pct = Math.min(100, Math.max(0, progress * 100));
     if (progressFill) progressFill.style.height = `${pct}%`;
 
-    const chapterIdx = Math.min(slideCount - 1, Math.floor(progress * slideCount));
+    const chapterIdx = activeChapterIndex(progress);
     dots.forEach((d, i) => d.classList.toggle('is-active', i === chapterIdx));
     navBtns.forEach((b, i) => b.classList.toggle('is-active', i === chapterIdx));
 
@@ -284,9 +336,9 @@ function initDesktopCinema(ctx) {
     const totalSec = Math.floor(progress * 120);
     const h = String(Math.floor(totalSec / 3600)).padStart(2, '0');
     const m = String(Math.floor((totalSec % 3600) / 60)).padStart(2, '0');
-    const s = String(totalSec % 60).padStart(2, '0');
+    const sec = String(totalSec % 60).padStart(2, '0');
     const f = String(Math.floor((progress * 120 * 24) % 24)).padStart(2, '0');
-    if (timecodeEl) timecodeEl.textContent = `${h}:${m}:${s}:${f}`;
+    if (timecodeEl) timecodeEl.textContent = `${h}:${m}:${sec}:${f}`;
   }
 
   navBtns.forEach((btn) => {
@@ -294,8 +346,8 @@ function initDesktopCinema(ctx) {
       const idx = Number(btn.dataset.chapter);
       const st = master.scrollTrigger;
       if (!st) return;
-      const target = (idx + 0.15) / slideCount;
-      const y = st.start + (st.end - st.start) * target;
+      const targetTime = chapterSwitchAt.find((p) => p.idx === idx)?.time ?? 0;
+      const y = st.start + (st.end - st.start) * (targetTime / totalDuration);
       window.scrollTo({ top: y, behavior: 'smooth' });
     };
     btn.addEventListener('click', handler);
