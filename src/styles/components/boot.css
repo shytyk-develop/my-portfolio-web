@@ -10,7 +10,7 @@
   padding: 16px;
   transition: opacity 0.8s ease, visibility 0.8s;
   pointer-events: auto;
-  touch-action: pan-y;
+  touch-action: manipulation;
   overscroll-behavior: contain;
 }
 #boot-terminal {
@@ -261,13 +261,19 @@ html.boot-scroll-lock body {
   touch-action: none;
 }
 
-html.boot-scroll-lock #content-wrapper {
+/* Block page content only — do not disable pointer-events on #boot-screen subtree */
+html.boot-scroll-lock #content-wrapper > :not(#boot-screen) {
   pointer-events: none;
+  user-select: none;
 }
 
-html.boot-scroll-lock #boot-screen,
-html.boot-scroll-lock #boot-screen * {
+html.boot-scroll-lock #boot-screen {
   pointer-events: auto;
+  touch-action: manipulation;
+}
+
+html.boot-scroll-lock #boot-welcome-overlay {
+  pointer-events: none !important;
 }
 
 html.boot-scroll-lock #boot-terminal-body {

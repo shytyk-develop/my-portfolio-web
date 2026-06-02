@@ -34,12 +34,7 @@ function onWheel(event) {
 
 function onTouchMove(event) {
   if (lockCount === 0) return;
-
-  if (isBootInteractiveTarget(event.target)) {
-    const el = document.querySelector(BOOT_SCROLLABLE);
-    if (el?.contains(event.target)) return;
-  }
-
+  if (isBootInteractiveTarget(event.target)) return;
   event.preventDefault();
 }
 
