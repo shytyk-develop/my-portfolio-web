@@ -1,5 +1,6 @@
 import { refreshIcons } from '../utils/icons.js';
 import { initSessionFromApi } from '../utils/session-key.js';
+import { unlockScroll } from '../utils/scroll-lock.js';
 
 const bootSequence = [
   { type: 'text', content: '<span class="boot-dim">──────────────────────────────────────────</span>' },
@@ -170,6 +171,7 @@ export function initBoot() {
         window.scrollTo(0, 0);
         setTimeout(() => {
           bootScreen.style.display = 'none';
+          unlockScroll({ scrollTo: 0 });
           refreshIcons();
           window.dispatchEvent(new CustomEvent('boot-complete'));
         }, 800);

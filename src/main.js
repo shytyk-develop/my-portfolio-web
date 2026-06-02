@@ -17,8 +17,12 @@ import { initWorkflow } from './js/modules/workflow.js';
 import { initSignals } from './js/modules/signals.js';
 import { renderExperienceSection } from './js/render/experience.js';
 import { initCinematic } from './js/cinematic/engine.js';
+import { lockScroll } from './js/utils/scroll-lock.js';
 
 function init() {
+  if (document.getElementById('boot-screen')) {
+    lockScroll();
+  }
   renderExperienceSection();
   initTheme();
   initCursor();

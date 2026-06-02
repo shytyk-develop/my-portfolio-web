@@ -9,6 +9,9 @@
   justify-content: center;
   padding: 16px;
   transition: opacity 0.8s ease, visibility 0.8s;
+  pointer-events: auto;
+  touch-action: pan-y;
+  overscroll-behavior: contain;
 }
 #boot-terminal {
   width: 100%;
@@ -238,4 +241,37 @@
     bottom: 1.5rem;
     right: 1.5rem;
   }
+}
+
+/* ─── Scroll lock while boot screen is active ─── */
+html.boot-scroll-lock {
+  overflow: hidden !important;
+  height: 100%;
+  overscroll-behavior: none;
+}
+
+html.boot-scroll-lock body {
+  overflow: hidden !important;
+  position: fixed;
+  width: 100%;
+  left: 0;
+  right: 0;
+  height: 100%;
+  overscroll-behavior: none;
+  touch-action: none;
+}
+
+html.boot-scroll-lock #content-wrapper {
+  pointer-events: none;
+}
+
+html.boot-scroll-lock #boot-screen,
+html.boot-scroll-lock #boot-screen * {
+  pointer-events: auto;
+}
+
+html.boot-scroll-lock #boot-terminal-body {
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
