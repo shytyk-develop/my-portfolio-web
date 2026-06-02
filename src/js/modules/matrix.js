@@ -4,7 +4,11 @@ export function initMatrix() {
 
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const isMobile = window.matchMedia('(max-width: 767px)').matches;
-  if (reducedMotion) {
+
+  // Disable the full-screen rain on reduced-motion and on mobile:
+  // a continuous full-canvas repaint is a heavy, battery-draining effect with
+  // near-zero visibility (opacity ~0.08) on small/low-end devices.
+  if (reducedMotion || isMobile) {
     canvas.style.display = 'none';
     return;
   }
@@ -17,7 +21,7 @@ export function initMatrix() {
   let drops = Array.from({ length: columns }, () => Math.random() * -100);
   let rafId = null;
   let lastFrame = 0;
-  const frameInterval = isMobile ? 48 : 32;
+  const frameInterval = 32;
 
   function draw() {
     const isLight = document.documentElement.getAttribute('data-theme') === 'light';
@@ -44,11 +48,19 @@ export function initMatrix() {
 
   rafId = requestAnimationFrame(loop);
 
+  // Debounce resize and ignore width-stable changes. Mobile browser chrome
+  // (URL bar) constantly fires resize on height-only changes — reallocating
+  // the canvas + drops array on each of those caused scroll jank.
+  let resizeTimer = null;
   window.addEventListener('resize', () => {
-    width = canvas.width = window.innerWidth;
-    height = canvas.height = window.innerHeight;
-    columns = Math.floor(width / 20);
-    drops = Array.from({ length: columns }, () => Math.random() * -100);
+    if (window.innerWidth === width) return;
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+      columns = Math.floor(width / 20);
+      drops = Array.from({ length: columns }, () => Math.random() * -100);
+    }, 150);
   });
 
   document.addEventListener('visibilitychange', () => {

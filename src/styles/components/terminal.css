@@ -153,3 +153,15 @@ input#cli {
   white-space: pre;
   opacity: 0.4;
 }
+
+/* ─── Terminal is desktop-only: fully removed on mobile ─── */
+@media (max-width: 767px) {
+  #side-drawer {
+    backdrop-filter: none;
+  }
+
+  #terminal-window,
+  .terminal-bar {
+    display: none !important;
+  }
+}

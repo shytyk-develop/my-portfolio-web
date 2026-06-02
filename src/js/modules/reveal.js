@@ -3,15 +3,40 @@ export function initReveal() {
   const revealSection = document.getElementById('reveal-section');
   if (!revealText || !revealSection) return;
 
-  revealSection.addEventListener('mousemove', (e) => {
-    if (window.innerWidth >= 768) {
-      const rect = revealText.getBoundingClientRect();
-      revealText.style.setProperty('--x', `${e.clientX - rect.left}px`);
-      revealText.style.setProperty('--y', `${e.clientY - rect.top}px`);
-    }
-  });
+  let cachedRect = null;
+  let pendingMouse = null;
+  let mouseTicking = false;
+  let scrollTicking = false;
 
-  window.addEventListener('scroll', () => {
+  const refreshRect = () => {
+    cachedRect = revealText.getBoundingClientRect();
+  };
+
+  const applyMouse = () => {
+    mouseTicking = false;
+    if (!pendingMouse || !cachedRect) return;
+    revealText.style.setProperty('--x', `${pendingMouse.x - cachedRect.left}px`);
+    revealText.style.setProperty('--y', `${pendingMouse.y - cachedRect.top}px`);
+  };
+
+  revealSection.addEventListener(
+    'mousemove',
+    (e) => {
+      if (window.innerWidth < 768) return;
+      if (!cachedRect) refreshRect();
+      pendingMouse = { x: e.clientX, y: e.clientY };
+      if (!mouseTicking) {
+        mouseTicking = true;
+        requestAnimationFrame(applyMouse);
+      }
+    },
+    { passive: true }
+  );
+
+  revealSection.addEventListener('mouseenter', refreshRect, { passive: true });
+
+  const applyScroll = () => {
+    scrollTicking = false;
     if (window.innerWidth >= 768) return;
     const rect = revealSection.getBoundingClientRect();
     const windowHeight = window.innerHeight;
@@ -22,7 +47,23 @@ export function initReveal() {
     progress = Math.max(-30, Math.min(130, progress));
     revealText.style.setProperty('--x', `${progress}%`);
     revealText.style.setProperty('--y', '50%');
+  };
+
+  window.addEventListener(
+    'scroll',
+    () => {
+      if (window.innerWidth >= 768) return;
+      if (!scrollTicking) {
+        scrollTicking = true;
+        requestAnimationFrame(applyScroll);
+      }
+    },
+    { passive: true }
+  );
+
+  window.addEventListener('resize', () => {
+    cachedRect = null;
   });
 
-  window.dispatchEvent(new Event('scroll'));
+  requestAnimationFrame(applyScroll);
 }

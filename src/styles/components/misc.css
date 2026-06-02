@@ -417,3 +417,25 @@
   opacity: 1;
   transform: translateX(0);
 }
+
+/* Mobile performance guardrails:
+   blur/backdrop-filter on large cards causes jank on low-end devices. */
+@media (max-width: 767px) {
+  .stack-item {
+    backdrop-filter: none;
+  }
+
+  #projects-list {
+    filter: none;
+    opacity: 0.45;
+  }
+
+  #projects-lock-wrapper.unlocked #projects-list {
+    opacity: 1;
+  }
+
+  #projects-gate-inner {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}

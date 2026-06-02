@@ -18,7 +18,19 @@ const availableSections = [
   'contact',
 ];
 
+const isMobileLayout = () => window.matchMedia('(max-width: 767px)').matches;
+
 export function initTerminal() {
+  // Terminal chat is desktop-only. On mobile we register safe no-op globals so
+  // inline onclick handlers and the hero "Execute" CTA never throw, then bail
+  // out before wiring any listeners (the UI itself is hidden via CSS).
+  if (isMobileLayout()) {
+    window.toggleTerminal = () => {};
+    window.clearTerminal = () => {};
+    window.openTerminalWithWelcome = () => {};
+    return;
+  }
+
   const terminalWindow = document.getElementById('terminal-window');
   const terminalBody = document.getElementById('terminal-body');
   const termToggleBtn = document.getElementById('term-toggle-btn');
