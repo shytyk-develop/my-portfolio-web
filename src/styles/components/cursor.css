@@ -1,0 +1,73 @@
+#cursor {
+  position: fixed;
+  left: 0;
+  top: 0;
+  pointer-events: none;
+  z-index: 100000;
+  will-change: transform;
+  opacity: 0;
+  transition: opacity 0.22s ease;
+}
+
+#cursor.is-visible {
+  opacity: 1;
+}
+
+.cursor-v,
+.cursor-h {
+  position: absolute;
+  left: 0;
+  top: 0;
+  background: var(--accent);
+  opacity: 0.36;
+  transform: translate(-50%, -50%);
+  transition:
+    opacity 0.18s ease,
+    width 0.2s var(--cinematic-ease),
+    height 0.2s var(--cinematic-ease),
+    transform 0.1s ease;
+}
+
+.cursor-v {
+  width: 1px;
+  height: 10px;
+}
+
+.cursor-h {
+  width: 10px;
+  height: 1px;
+}
+
+#cursor.is-interactive .cursor-v {
+  height: 12px;
+  opacity: 0.68;
+}
+
+#cursor.is-interactive .cursor-h {
+  width: 12px;
+  opacity: 0.68;
+}
+
+#cursor.is-text .cursor-h {
+  width: 0;
+  opacity: 0;
+}
+
+#cursor.is-text .cursor-v {
+  height: 14px;
+  opacity: 0.5;
+}
+
+#cursor.is-pressed .cursor-v,
+#cursor.is-pressed .cursor-h {
+  opacity: 0.92;
+  transform: translate(-50%, -50%) scale(0.88);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #cursor,
+  .cursor-v,
+  .cursor-h {
+    transition: none;
+  }
+}

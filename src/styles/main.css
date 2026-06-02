@@ -1,6 +1,7 @@
 @import './tailwind.css';
 @import './tokens.css';
 @import './base.css';
+@import './components/cursor.css';
 @import './typography.css';
 @import './sections/hero.css';
 @import './sections/experience.css';
