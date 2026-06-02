@@ -418,24 +418,21 @@
   transform: translateX(0);
 }
 
-/* Mobile performance guardrails:
-   blur/backdrop-filter on large cards causes jank on low-end devices. */
+/* Mobile performance guardrails (keep projects lock blur — core UX) */
 @media (max-width: 767px) {
   .stack-item {
     backdrop-filter: none;
   }
 
+  /* Slightly lighter than desktop; still reads as “locked” behind the gate */
   #projects-list {
-    filter: none;
-    opacity: 0.45;
-  }
-
-  #projects-lock-wrapper.unlocked #projects-list {
-    opacity: 1;
+    filter: blur(8px);
+    opacity: 0.35;
   }
 
   #projects-gate-inner {
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    background: color-mix(in srgb, var(--card-bg) 88%, transparent);
   }
 }
